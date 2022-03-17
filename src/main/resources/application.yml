@@ -1,0 +1,7 @@
+server:
+  port: 9001  # HTTP port
+  tomcat:
+    connection-timeout: 2s  # Connection timeout
+    threads:
+      max: 50
+      min-spare: 5  # how many threads are created at startup

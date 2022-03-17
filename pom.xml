@@ -13,13 +13,23 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>catalog-service</name>
 	<description>Demo project for Spring Boot</description>
+
 	<properties>
 		<java.version>11</java.version>
+		<lombok.version>1.18.22</lombok.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
