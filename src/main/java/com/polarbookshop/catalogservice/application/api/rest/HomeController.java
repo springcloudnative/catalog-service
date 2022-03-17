@@ -10,4 +10,5 @@ public class HomeController {
     public String getGreeting() {
         return "Welcome to the book catalog!";
     }
+
 }
