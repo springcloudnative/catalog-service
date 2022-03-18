@@ -1,4 +1,4 @@
-package com.polarbookshop.catalogservice.application.api.rest.service;
+package com.polarbookshop.catalogservice.application.service;
 
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
 
