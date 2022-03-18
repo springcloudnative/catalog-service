@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("books")
@@ -25,7 +27,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookAggregate post(@RequestBody BookAggregate book) {
+    public BookAggregate post(@Valid @RequestBody BookAggregate book) {
         return bookService.addBookToCatalog(book);
     }
 
@@ -37,7 +39,7 @@ public class BookController {
 
     @PutMapping("{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public BookAggregate put(@PathVariable String isbn, @RequestBody BookAggregate book) {
+    public BookAggregate put(@PathVariable String isbn, @Valid @RequestBody BookAggregate book) {
         return bookService.editBookDetails(isbn, book);
     }
 }
