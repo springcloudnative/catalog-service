@@ -97,3 +97,48 @@ Forwarding from [::1]:8000 -> 8080
 **service/catalog-service**: Which resource to expose
 **8000**: The port on your localhost
 **8080**: The port of the service
+
+# USING PROFILES AS FEATURE FLAGS
+This use case for profiles is for loading groups of beans only if the specified profile is active. The deployment environment shouldn’t influence the reasoning behind the grouping too much. A
+common mistake is using profiles like **dev** or **prod** to load beans conditionally. If you do that, the application will be coupled with the environment, usually not what we want for a cloud
+native application.
+The recommendation is using profiles as feature flags when associated with groups of beans to be loaded conditionally. Consider which functionality a profile provides and name it accordingly
+rather than thinking about where it will be enabled.
+However, there might be cases where a bean handling infrastructural concerns is required in specific platforms. For example, you might have
+certain beans that should only be loaded when the application is deployed to a Kubernetes environment (no matter if staging or production). 
+In that case, you could define a **kubernetes** profile.
+
+# USING PROFILES AS CONFIGURATION GROUPS
+The 15-Factors methodology recommends not batching configuration values into groups named after environments and bundled with the application source code.
+The reason is that it wouldn’t scale: as a project grows, new environments might be created for different stages.
+The 15-Factor methodology promotes storing configuration in the environment, from the higher to the lowest:
+- Defined as CLI argument
+- Defined as JVM property
+- Defined as environment variable
+- Defined in property files
+- Default (if any)
+
+Both CLI arguments and JVM properties let you externalize the configuration and keep the application build immutable. However, they require a different command to run the application,
+which might result in errors at deployment time. **A better approach is using environment variables**, as recommended by the 15-Factor methodology.
+One of the advantages of environment variables is that any operating system supports them, making them portable across any environment. Furthermore, most programming languages
+provide features to access environment variables. For example, in Java, you can do that by calling the *System.getenv()* method.
+In Spring, you are not required to read environment variables from the surrounding system explicitly. Spring automatically reads them during the startup phase and adds them to the Spring
+Environment object, making them accessible, just like any other property. For example, if you run a Spring application in an environment where the MY_ENV_VAR variable is defined, you can
+access its value either from the Environment interface or using the @Value annotation.
+
+You can turn a Spring property key into an environment variable by making all letters uppercase and replacing any dot or dash with an underscore. Spring Boot will map it correctly to the
+internal syntax. For example, a **POLAR_GREETING** environment variable is recognized as the **polar.greeting** property. This feature is called relaxed binding.
+```
+$ export POLAR_GREETING="Welcome to the catalog from ENV" && \
+java -jar build/libs/catalog-service-0.0.1-SNAPSHOT.jar
+```
+On Windows:
+```
+$ set POLAR_GREETING="Welcome to the catalog from ENV" && \
+java -jar build/libs/catalog-service-0.0.1-SNAPSHOT.jar
+```
+
+Remove the environment variable from your current Terminal session with the command *unset POLAR_GREETING* (macOS/Linux) or *set POLAR_GREETING=* (Windows).
+
+**You can use environment variables to define values for your configuration data depending on the infrastructure or platform where the application is
+deployed, such as profiles, port numbers, IP addresses, and URLs.**
