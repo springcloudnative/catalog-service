@@ -1,6 +1,12 @@
-# Run Spring Boot app with mvnw from command line
+# Run Spring Boot app with Maven wrapper from command line
 ```
 ./mvnw spring-boot:run
+```
+
+# Run Spring Boot test with Maven wrapper from command line
+**./mvnw test -Dtest=<test_class_name>**
+```
+./mvnw test -Dtest=CatalogServiceApplicationTests
 ```
 # Create a Spring application image using BuildPacks
 ```
