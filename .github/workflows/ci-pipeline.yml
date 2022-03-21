@@ -15,7 +15,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: Compile and test application  # Ensures the Maven wrapper is executable
-                                            # and asembles the code and run unit and integration tests
         run: |
           chmod +x mvnw
           ./mvnw test package
