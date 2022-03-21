@@ -5,3 +5,6 @@ server:
     threads:
       max: 50
       min-spare: 5  # how many threads are created at startup
+
+polar:
+  greeting: Welcome to the local book catalog!
