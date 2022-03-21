@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<lombok.version>1.18.22</lombok.version>
+		<json.version>20180130</json.version>
 	</properties>
 
 	<dependencies>
@@ -40,6 +41,12 @@
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${json.version}</version>
 		</dependency>
 
 		<dependency>
