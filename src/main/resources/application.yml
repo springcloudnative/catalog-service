@@ -9,45 +9,27 @@ server:
 spring:
   application:
     name: catalog-service
-
----
-spring:
   config:
-    activate:
-      on-profile: test-data
     import: "optional:configserver:"
   cloud:
     config:
       uri: http://localhost:8888
       request-connect-timeout: 2000 # Timeout on waiting to connect to the config server (ms)
       request-read-timeout: 5000    # Timeout on waiting to read configuration data from the config server (ms)
-      fail-fast: false              # Makes a failure to connect to the config server fatal
+      fail-fast: false
       retry:
-        max-attempts: 6             # Maximum number of attempts
-        initial-interval: 1000      # Initial retry interval for backoff (ms)
-        max-interval: 2000          # Maximum retry interval for backoff (ms)
-        multiplier: 1.1             # Multiplier to compute the next interval
+        max-attempts: 6
+        initial-interval: 1000 # 1s
+        max-interval: 2000 # 2s
+        multiplier: 1.1
   profiles:
-    active: test-data
+    active: testdata
 
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  cloud:
-    config:
-      uri: http://localhost:8888
-      request-connect-timeout: 2000 # Timeout on waiting to connect to the config server (ms)
-      request-read-timeout: 5000    # Timeout on waiting to read configuration data from the config server (ms)
-      fail-fast: true               # Makes a failure to connect to the config server fatal
-      retry:
-        max-attempts: 6             # Maximum number of attempts
-        initial-interval: 1000      # Initial retry interval for backoff (ms)
-        max-interval: 2000          # Maximum retry interval for backoff (ms)
-        multiplier: 1.1             # Multiplier to compute the next interval
-  profiles:
-    active: prod
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
 
 polar:
   greeting: Welcome to the local book catalog!
