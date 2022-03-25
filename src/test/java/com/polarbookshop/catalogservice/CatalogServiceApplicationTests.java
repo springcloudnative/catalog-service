@@ -69,6 +69,7 @@ class CatalogServiceApplicationTests {
 									.title("Title")
 									.author("Author")
 									.price(9.90)
+									.publisher("Polarsophia")
 									.build();
 
 		webTestClient
@@ -85,17 +86,18 @@ class CatalogServiceApplicationTests {
 	@Test
 	public void whenPutRequestThenBookUpdated() {
 		String bookIsbn = "1231231232";
+
 		BookAggregate bookToCreate = BookAggregate.builder()
-				.id(1L)
 				.isbn(bookIsbn)
 				.title("Title")
 				.author("Author")
 				.price(9.90)
-				.version(1)
+				.publisher("Polarsophia")
 				.build();
 
 		BookAggregate createdBook = webTestClient
-					.post().uri("/books")
+					.post()
+					.uri("/books")
 					.bodyValue(bookToCreate)
 					.exchange()
 					.expectStatus().isCreated()
@@ -105,10 +107,15 @@ class CatalogServiceApplicationTests {
 				.returnResult().getResponseBody();
 
 		BookAggregate bookToUpdate = BookAggregate.builder()
+				.id(createdBook.getId())
 				.isbn(createdBook.getIsbn())
 				.title(createdBook.getTitle())
 				.author(createdBook.getAuthor())
 				.price(7.95)
+				.publisher(createdBook.getPublisher())
+				.createdDate(createdBook.getCreatedDate())
+				.lastModifiedDate(createdBook.getLastModifiedDate())
+				.version(createdBook.getVersion())
 				.build();
 
 		webTestClient

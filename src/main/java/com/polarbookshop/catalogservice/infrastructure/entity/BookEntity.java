@@ -51,27 +51,6 @@ public class BookEntity {
                 .build();
     }
 
-    /**
-     * An entity is considered new when the id is null
-     * and the version is 0.
-     * @param book
-     * @return
-     */
-    public BookEntity build(BookAggregate book) {
-
-        return BookEntity.builder()
-                .id(null)
-                .isbn(book.getIsbn())
-                .title(book.getTitle())
-                .author(book.getAuthor())
-                .price(book.getPrice())
-                .publisher(book.getPublisher())
-                .createdDate(null)
-                .lastModifiedDate(null)
-                .version(0)
-                .build();
-    }
-
     public static BookEntity build(String isbn, String title,
                                    String author, Double price,
                                    String publisher) {

@@ -75,8 +75,17 @@ public class BookServiceImpl implements BookService {
             return addBookToCatalog(book);
         }
 
-        BookEntity bookToUpdate = new BookEntity();
-        BeanUtils.copyProperties(book, bookToUpdate);
+        BookEntity bookToUpdate = new BookEntity(
+                existingBook.get().getId(),
+                existingBook.get().getIsbn(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getPrice(),
+                book.getPublisher(),
+                existingBook.get().getCreatedDate(),
+                existingBook.orElseThrow().getLastModifiedDate(),
+                existingBook.get().getVersion()
+        );
 
         return bookRepository.save(bookToUpdate).toBookAggregate();
     }

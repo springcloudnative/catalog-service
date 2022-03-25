@@ -17,6 +17,16 @@
 ```
 gradlew build --> mvnw test package
 ```
+
+# Creating images with Dockerfiles
+```
+docker build -t my-java-image:1.0.0 .
+```
+
+**docker build**: Command to build a Docker image
+**-t my-java-image:1.0.0**: Name and version of the image to build
+**.**: Search for a Dockerfile in the current folder
+
 # Running a Docker image from command line
 ```
 docker run --rm --name catalog-service -p 8080:8080 catalog-service:0.0.1-SNAPSHOT
