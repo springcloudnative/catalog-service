@@ -39,7 +39,8 @@ class CatalogServiceApplicationTests {
 	@Test
 	public void whenGetRequestWithIdThenBookReturned() {
 		String bookIsbn = "1231231230";
-		BookEntity bookToCreate = BookEntity.build(bookIsbn, "Title", "Author", 9.90);
+		BookEntity bookToCreate = BookEntity.build(bookIsbn, "Title", "Author",
+				9.90, "Polarsophia");
 
 		BookEntity expectedBook = webTestClient
 					.post()

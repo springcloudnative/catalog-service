@@ -1,15 +1,20 @@
 package com.polarbookshop.catalogservice.infrastructure.repository;
 
-import org.springframework.stereotype.Component;
+import com.polarbookshop.catalogservice.domain.repository.BooksRepository;
+import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Component("mySqlDbCatalogRepository")
-public class MySqlDbCatalogRepository {
- /*       implements BookRepository {
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class MySqlDbCatalogRepository implements BooksRepository {
 
     private final SpringDataPostgresCatalogRepository bookRepository;
 
     @Autowired
-    public MySqlDbCatalogRepository4(SpringDataPostgresCatalogRepository bookRepository) {
+    public MySqlDbCatalogRepository(SpringDataPostgresCatalogRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
@@ -46,5 +51,5 @@ public class MySqlDbCatalogRepository {
     @Override
     public void deleteAll() {
         this.bookRepository.deleteAll();
-    }*/
+    }
 }

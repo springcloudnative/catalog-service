@@ -28,6 +28,8 @@ public class BookEntity {
     private String author;
     private Double price;
 
+    String publisher;
+
     @CreatedDate
     private Instant createdDate;
 
@@ -43,6 +45,7 @@ public class BookEntity {
                 .title(this.title)
                 .author(this.author)
                 .price(this.price)
+                .publisher(this.publisher)
                 .createdDate(this.createdDate)
                 .lastModifiedDate(this.lastModifiedDate)
                 .build();
@@ -62,6 +65,7 @@ public class BookEntity {
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .price(book.getPrice())
+                .publisher(book.getPublisher())
                 .createdDate(null)
                 .lastModifiedDate(null)
                 .version(0)
@@ -69,7 +73,8 @@ public class BookEntity {
     }
 
     public static BookEntity build(String isbn, String title,
-                                   String author, Double price) {
+                                   String author, Double price,
+                                   String publisher) {
 
         return BookEntity.builder()
                 .id(null)
@@ -77,6 +82,7 @@ public class BookEntity {
                 .title(title)
                 .author(author)
                 .price(price)
+                .publisher(publisher)
                 .createdDate(null)
                 .lastModifiedDate(null)
                 .version(0)

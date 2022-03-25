@@ -31,7 +31,7 @@ public class BookRepositoryJdbcTests {
     public void findBookByIsbnWhenExisting() {
         String bookIsbn = "1234561235";
         BookEntity book = new BookEntity(null, bookIsbn, "Title", "Author",
-                12.9, null, null, 0);
+                12.9, "Polarsophia", null, null, 0);
 
         BookEntity expectedBook = jdbcAggregateTemplate.insert(book);
 
@@ -49,8 +49,10 @@ public class BookRepositoryJdbcTests {
 
     @Test
     void findAllBooks() {
-        BookEntity book1 = BookEntity.build("1234561235", "Title", "Author", 12.90);
-        BookEntity book2 = BookEntity.build("1234561236", "Another Title", "Author", 12.90);
+        BookEntity book1 = BookEntity.build("1234561235", "Title", "Author",
+                12.90, "Polarsophia");
+        BookEntity book2 = BookEntity.build("1234561236", "Another Title", "Author",
+                12.90, "Polarsophia");
         jdbcAggregateTemplate.insert(book1);
         jdbcAggregateTemplate.insert(book2);
 
@@ -65,7 +67,8 @@ public class BookRepositoryJdbcTests {
     @Test
     void existsByIsbnWhenExisting() {
         var bookIsbn = "1234561239";
-        var bookToCreate = BookEntity.build(bookIsbn, "Title", "Author", 12.90);
+        var bookToCreate = BookEntity.build(bookIsbn, "Title", "Author",
+                12.90, "Polarsophia");
         jdbcAggregateTemplate.insert(bookToCreate);
 
         boolean existing = bookRepository.existsByIsbn(bookIsbn);
@@ -82,7 +85,8 @@ public class BookRepositoryJdbcTests {
     @Test
     void deleteByIsbn() {
         var bookIsbn = "1234561241";
-        var bookToCreate = BookEntity.build(bookIsbn, "Title", "Author", 12.90);
+        var bookToCreate = BookEntity.build(bookIsbn, "Title", "Author",
+                12.90, "Polarsophia");
         var persistedBook = jdbcAggregateTemplate.insert(bookToCreate);
 
         bookRepository.deleteByIsbn(bookIsbn);

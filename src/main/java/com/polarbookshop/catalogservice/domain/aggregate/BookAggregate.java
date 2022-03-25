@@ -33,6 +33,8 @@ public class BookAggregate {
     @Positive(message = "The book price must be greater than zero.")
     private Double price;
 
+    String publisher;
+
     private Instant createdDate;
 
     private Instant lastModifiedDate;

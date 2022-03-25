@@ -1,14 +1,20 @@
 package com.polarbookshop.catalogservice.infrastructure.repository;
 
-//@Repository
-public interface SpringDataPostgresCatalogRepository {
-/*        extends CrudRepository<BookEntity, Long> {
+import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+public interface SpringDataPostgresCatalogRepository extends CrudRepository<BookEntity, Long> {
 
     Optional<BookEntity> findByIsbn(String isbn);
     boolean existsByIsbn(String isbn);
 
     @Modifying
     @Transactional
-    @Query("delete from BookEntity where isbn = :isbn")
-    void deleteByIsbn(String isbn);*/
+    @Query("delete from books where isbn = :isbn")
+    void deleteByIsbn(String isbn);
 }

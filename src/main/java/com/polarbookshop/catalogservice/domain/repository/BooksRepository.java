@@ -5,7 +5,7 @@ import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
 import java.util.List;
 import java.util.Optional;
 
-public interface BookRepository4 {
+public interface BooksRepository {
 
     Iterable<BookEntity> findAll();
     Optional<BookEntity> findByIsbn(String isbn);

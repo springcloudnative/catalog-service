@@ -1,6 +1,6 @@
 package com.polarbookshop.catalogservice.infrastructure.configuration;
 
-import com.polarbookshop.catalogservice.domain.repository.BookRepository4;
+import com.polarbookshop.catalogservice.domain.repository.BooksRepository;
 import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
 import lombok.Data;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,7 +15,7 @@ import java.util.List;
 @Profile("test-data")
 public class BookDataLoader {
 
-    private final BookRepository4 bookRepository4;
+    private final BooksRepository booksRepository;
 
     /**
      * The test data generation is triggered when an ApplicationReadyEvent
@@ -24,15 +24,15 @@ public class BookDataLoader {
     @EventListener(ApplicationReadyEvent.class)
     public void loadBookTestData() {
         // delete all existing books, if any, to start from an empty database
-        this.bookRepository4.deleteAll();
+        this.booksRepository.deleteAll();
 
         BookEntity book1 = BookEntity.build("1234567891", "Northern Lights",
-                "Lyra Silvertongue", 9.90);
+                "Lyra Silvertongue", 9.90, "Polarsophia");
 
         BookEntity book2 = BookEntity.build("1234567892", "Polar Journey",
-                "Iorek Polarson", 12.90);
+                "Iorek Polarson", 12.90, "Polarsophia");
 
         // save multiple objects at once
-        bookRepository4.saveAll(List.of(book1, book2));
+        booksRepository.saveAll(List.of(book1, book2));
     }
 }

@@ -37,6 +37,7 @@ public class BookJsonTests {
                 .title("Title")
                 .author("Author")
                 .price(9.90)
+                .publisher("Polarsophia")
                 .createdDate(now)
                 .lastModifiedDate(now)
                 .version(21)
@@ -45,7 +46,7 @@ public class BookJsonTests {
         JsonContent<BookAggregate> jsonContent = json.write(book);
 
         assertThat(jsonContent).extractingJsonPathNumberValue("@.id")
-                .isEqualTo(book.getId());
+                .isEqualTo(book.getId().intValue());
         assertThat(jsonContent).extractingJsonPathStringValue("@.isbn")
                 .isEqualTo(book.getIsbn());
         assertThat(jsonContent).extractingJsonPathStringValue("@.title")
@@ -53,11 +54,13 @@ public class BookJsonTests {
         assertThat(jsonContent).extractingJsonPathStringValue("@.author")
                 .isEqualTo(book.getAuthor());
         assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate")
-                .isEqualTo(book.getAuthor());
+                .isEqualTo(book.getCreatedDate().toString());
         assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedDate")
-                .isEqualTo(book.getAuthor());
+                .isEqualTo(book.getLastModifiedDate().toString());
         assertThat(jsonContent).extractingJsonPathNumberValue("@.price")
                 .isEqualTo(book.getPrice());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.publisher")
+                .isEqualTo(book.getPublisher());
         assertThat(jsonContent).extractingJsonPathNumberValue("@.version")
                 .isEqualTo(book.getVersion());
     }
@@ -73,6 +76,7 @@ public class BookJsonTests {
                 .put("title", "Title")
                 .put("author", "Author")
                 .put("price", 9.90)
+                .put("publisher", "Polarsophia")
                 .put("createdDate", "2021-09-07T22:50:37.135029Z")
                 .put("lastModifiedDate", "2021-09-07T22:50:37.135029Z")
                 .put("version", 21).toString();
@@ -82,7 +86,7 @@ public class BookJsonTests {
                 .usingRecursiveComparison()
                 .isEqualTo(new BookAggregate(394L, "1234567890",
                         "Title", "Author",
-                        9.90, instant,
+                        9.90, "Polarsophia", instant,
                         instant, 21));
     }
 }
