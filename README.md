@@ -87,7 +87,25 @@ mvnw package
 docker build --build-arg JAR_FILE=target/*.jar -t <your_dockerhub_username>/catalog-service:0.0.1-SNAPSHOT .
 ```
 
+- Use Snyk to check if it contains any vulnerabilities:
+```
+docker scan <your_dockerhub_username>/catalog-service:0.0.1-SNAPSHOT --file=Dockerfile
+```
+
 - In the Docker Compose add a service for the image created for the Spring Boot application.
+
+
+# Building container images for production
+Spring Boot made that even more efficient by introducing a new way of packaging applications as JAR artifacts: **the layered-JAR** mode. And
+since Spring Boot 2.4, that’s the default mode, so you don’t need any extra configuration to use the new functionality.
+Applications packaged using the layered-JAR mode are made up of layers, similar to how container images work. This new feature is excellent for building more efficient images. When
+using the new JAR packaging, we can expand the JAR artifact and then create a different image layer for each JAR layer. The goal is to have your own classes (changing more frequently) on a
+separate layer than the project dependencies (changing less frequently).
+By default, Spring Boot applications are packaged as JAR artifacts made up of the following layers, starting from the lowest:
+- **dependencies** for all the main dependencies added to the project;
+- **spring-boot-loader** for the classes used by the Spring Boot loader component;
+- **snapshot-dependencies** for all the snapshot dependencies;
+- **application** for your application classes and resources.
 
 # Install kind on Windows
 1. Run the following command in an Admin PowerShell window to install chocolatey package:
