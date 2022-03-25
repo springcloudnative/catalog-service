@@ -27,6 +27,23 @@ docker build -t my-java-image:1.0.0 .
 **-t my-java-image:1.0.0**: Name and version of the image to build
 **.**: Search for a Dockerfile in the current folder
 
+#Publishing images on Docker Hub
+Container images follow common naming conventions which are adopted from all the major registries: *<registry>/<username>/<repository>[:<tag>]*.
+1. **Registry hostname**. The hostname for the registry where the image is stored. When using Docker Hub, the registry hostname is docker.io. The Docker Engine will implicitly
+prepend the image name with docker.io when you don’t specify one.
+2. **Username or repository path**. When using Docker Hub, it will be your Docker username. In other registries, it might be the path to the repository.
+3. **Repository and tag**. The repository that contains all the versions of your image. It’s optionally followed by a tag
+
+You have to define an additional name for the image following the conventions required by DockerHub (that is, you
+need to tag the image). You can do so with the *docker tag* command.
+```
+docker tag my-java-image:1.0.0 <your_dockerhub_username>/my-java-image:1.0.0
+```
+Then, you can finally push it to Docker Hub.
+```
+docker push <your_dockerhub_username>/my-java-image:1.0.0
+```
+
 # Running a Docker image from command line
 ```
 docker run --rm --name catalog-service -p 8080:8080 catalog-service:0.0.1-SNAPSHOT
