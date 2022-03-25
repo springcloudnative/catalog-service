@@ -16,6 +16,7 @@
 # Gradle wrapper command Maven equivalents
 ```
 gradlew build --> mvnw test package
+gradlew bootJar --> mvnw spring-boot:run 
 ```
 
 # Creating images with Dockerfiles
@@ -27,7 +28,7 @@ docker build -t my-java-image:1.0.0 .
 **-t my-java-image:1.0.0**: Name and version of the image to build
 **.**: Search for a Dockerfile in the current folder
 
-#Publishing images on Docker Hub
+# Publishing images on Docker Hub
 Container images follow common naming conventions which are adopted from all the major registries: *<registry>/<username>/<repository>[:<tag>]*.
 1. **Registry hostname**. The hostname for the registry where the image is stored. When using Docker Hub, the registry hostname is docker.io. The Docker Engine will implicitly
 prepend the image name with docker.io when you don’t specify one.
@@ -55,6 +56,38 @@ docker run --rm --name catalog-service -p 8080:8080 catalog-service:0.0.1-SNAPSH
 **catalog-service:0.0.1-SNAPSHOT**: Name and version of the image to run
 
 IntelliJ Github token: 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
+
+# Packaging Spring Boot applications as container images
+- Create a network inside which Catalog Service and MySQL can talk to each other using the container name instead of an IP address or a hostname.
+```
+docker network create catalog-network
+```
+
+- Create a Dockerfile in the root of the Spring Boot project. 
+- Start a MySQL container, specifying that it should be part of the catalog-network you just created. Using the --net argument, the container will join the
+  specified network and rely on the Docker built-in DNS servers:
+```
+docker run \
+--name polar-postgres-catalog \
+--net catalog-network \
+-e MYSQL_USER=user \
+-e MYSQL_PASSWORD=password \
+-e MYSQL_ROOT_PASSWORD=password \
+-e MYSQL_DATABASE=polardb_catalog \
+-p 3306:3306 \
+-d mysql:8.0
+```
+
+- Build the JAR artifact
+```
+mvnw package
+```
+- Build the container image:
+```
+docker build --build-arg JAR_FILE=target/*.jar -t <your_dockerhub_username>/catalog-service:0.0.1-SNAPSHOT .
+```
+
+- In the Docker Compose add a service for the image created for the Spring Boot application.
 
 # Install kind on Windows
 1. Run the following command in an Admin PowerShell window to install chocolatey package:
