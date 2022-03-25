@@ -38,7 +38,6 @@ public class BookController {
     }
 
     @PutMapping("{isbn}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public BookAggregate put(@PathVariable String isbn, @Valid @RequestBody BookAggregate book) {
         return bookService.editBookDetails(isbn, book);
     }

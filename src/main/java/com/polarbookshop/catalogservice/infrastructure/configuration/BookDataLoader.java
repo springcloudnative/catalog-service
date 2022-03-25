@@ -1,6 +1,6 @@
 package com.polarbookshop.catalogservice.infrastructure.configuration;
 
-import com.polarbookshop.catalogservice.domain.repository.BookRepository;
+import com.polarbookshop.catalogservice.domain.repository.BookRepository4;
 import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
 import lombok.Data;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Data
 @Component
 @Profile("test-data")
 public class BookDataLoader {
 
-    private final BookRepository bookRepository;
+    private final BookRepository4 bookRepository4;
 
     /**
      * The test data generation is triggered when an ApplicationReadyEvent
@@ -21,13 +23,16 @@ public class BookDataLoader {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void loadBookTestData() {
-        BookEntity book1 = new BookEntity("1234567891", "Northern Lights",
+        // delete all existing books, if any, to start from an empty database
+        this.bookRepository4.deleteAll();
+
+        BookEntity book1 = BookEntity.build("1234567891", "Northern Lights",
                 "Lyra Silvertongue", 9.90);
 
-        BookEntity book2 = new BookEntity("1234567892", "Polar Journey",
+        BookEntity book2 = BookEntity.build("1234567892", "Polar Journey",
                 "Iorek Polarson", 12.90);
 
-        bookRepository.save(book1);
-        bookRepository.save(book2);
+        // save multiple objects at once
+        bookRepository4.saveAll(List.of(book1, book2));
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
+import java.time.Instant;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -27,38 +29,60 @@ public class BookJsonTests {
 
     @Test
     public void testSerialize() throws Exception {
+
+        Instant now = Instant.now();
         BookAggregate book = BookAggregate.builder()
+                .id(394L)
                 .isbn("1234567890")
                 .title("Title")
                 .author("Author")
                 .price(9.90)
+                .createdDate(now)
+                .lastModifiedDate(now)
+                .version(21)
                 .build();
 
         JsonContent<BookAggregate> jsonContent = json.write(book);
 
+        assertThat(jsonContent).extractingJsonPathNumberValue("@.id")
+                .isEqualTo(book.getId());
         assertThat(jsonContent).extractingJsonPathStringValue("@.isbn")
                 .isEqualTo(book.getIsbn());
         assertThat(jsonContent).extractingJsonPathStringValue("@.title")
                 .isEqualTo(book.getTitle());
         assertThat(jsonContent).extractingJsonPathStringValue("@.author")
                 .isEqualTo(book.getAuthor());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate")
+                .isEqualTo(book.getAuthor());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedDate")
+                .isEqualTo(book.getAuthor());
         assertThat(jsonContent).extractingJsonPathNumberValue("@.price")
                 .isEqualTo(book.getPrice());
+        assertThat(jsonContent).extractingJsonPathNumberValue("@.version")
+                .isEqualTo(book.getVersion());
     }
 
     @Test
     public void testDeserialize() throws Exception {
 
+        Instant instant = Instant.parse("2021-09-07T22:50:37.135029Z");
         JSONObject jsonObject = new JSONObject();
         String content = jsonObject
+                .put("id", 394L)
                 .put("isbn", "1234567890")
                 .put("title", "Title")
                 .put("author", "Author")
-                .put("price", 9.90).toString();
+                .put("price", 9.90)
+                .put("createdDate", "2021-09-07T22:50:37.135029Z")
+                .put("lastModifiedDate", "2021-09-07T22:50:37.135029Z")
+                .put("version", 21).toString();
 
         // Verifying the parsing from JSON to Java
         assertThat(json.parse(content))
                 .usingRecursiveComparison()
-                .isEqualTo(new BookAggregate("1234567890", "Title", "Author", 9.90));
+                .isEqualTo(new BookAggregate(394L, "1234567890",
+                        "Title", "Author",
+                        9.90, instant,
+                        instant, 21));
     }
 }

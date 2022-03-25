@@ -24,6 +24,15 @@ spring:
         multiplier: 1.1
   profiles:
     active: testdata
+  datasource:
+    url: jdbc:mysql://localhost:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
+    username: user
+    password: password
+    platform: mysql
+    hikari:
+      connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
+      maximum-pool-size: 5      # The maximum number of connections Hikari CP will keep in the pool
+      connectionTestQuery: SELECT 1
 
 management:
   endpoints:
