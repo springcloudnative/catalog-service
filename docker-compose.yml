@@ -33,6 +33,8 @@ services:
     image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
     container_name: catalog-service
     environment:
+      BPL_DEBUG_ENABLED: true   # Activates the JVM configuration for accepting debug connections
+      BPL_DEBUG_PORT: 8001      # Debug connections are accepted via a socket on port 8001
       BPL_JVM_THREAD_COUNT: 50
       SPRING_DATASOURCE_URL: jdbc:mysql://polar_mysql_catalog:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
       MYSQL_USER: 'user'
@@ -43,6 +45,7 @@ services:
       WAIT_SLEEP_INTERVAL: 30
       WAIT_HOST_CONNECT_TIMEOUT: 30
     ports:
+      - '8001:8001' # The port where the JVM will listen for debug connections
       - '9001:9001'
     depends_on:
       - polar_mysql_catalog
