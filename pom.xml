@@ -23,6 +23,14 @@
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<postgresql.version>42.3.3</postgresql.version>
 		<testcontainersVersion>1.16.3</testcontainersVersion>
+		<!--The username to use when authenticating with the container registry. The value is
+		passed as a Maven property-->
+		<registryUsername>${REGISTRY_USERNAME}</registryUsername>
+		<!--The token to use when authenticating with the container registry. The value is
+		passed as a Maven property.-->
+		<registryToken>${REGISTRY_TOKEN}</registryToken>
+		<!--The container registry URL. The value is passed as a Maven property.-->
+		<registryUrl>${REGISTRY_URL}</registryUrl>
 	</properties>
 
 	<dependencyManagement>
@@ -139,6 +147,31 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
+					<image>
+						<name>${registryUsername}/${project.name}:${project.version}</name>
+						<env>
+							<BP_JVM_VERSION>11</BP_JVM_VERSION>
+						</env>
+					</image>
+					<docker>
+						<builderRegistry>
+							<username>${registryUsername}</username>
+							<password>${registryToken}</password>
+							<url>${registryUrl}</url>
+						</builderRegistry>
+					</docker>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-image</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>

@@ -220,3 +220,52 @@ Remove the environment variable from your current Terminal session with the comm
 
 **You can use environment variables to define values for your configuration data depending on the infrastructure or platform where the application is
 deployed, such as profiles, port numbers, IP addresses, and URLs.**
+
+# Containerizing Spring Boot with Cloud Native Buildpacks
+Cloud Native Buildpacks (buildpacks.io) is a project hosted by the CNCF to "transform your application source code into images that can run on any cloud".
+Some of its features are:
+- it auto-detects the type of application and packages it without requiring a Dockerfile;
+- it supports multiple languages and platforms;
+- it’s highly performant through caching and layering;
+- it guarantees reproducible builds;
+- it relies on best practices in terms of security;
+- it produces production-grade images;
+- it supports building native images using GraalVM.
+
+```
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <layers>
+            <enabled>true</enabled>
+        </layers>
+        <image>
+            <name>${dockerhub_username}/${project.name}:${project.version}</name>
+            <env>
+                <BP_JVM_VERSION>11</BP_JVM_VERSION>
+            </env>
+        </image>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>build-image</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+Building the image:
+```
+mvnw spring-boot:build-image -DREGISTRY_URL=docker.io -DREGISTRY_USERNAME=<your_dockerhub_username> -DREGISTRY_TOKEN=<your_dockerhub_token>
+```
+
+The Spring Boot plugin lets you use a password to authenticate with the registry, but you should use a token instead. Where can you get one? Go to your account settings on
+Docker Hub ( ). There, you’ll find a section named hub.docker.com Security where you can generate an access token.
+To use the access token from your Docker CLI client:
+
+1. Run docker login -u ernestoacostacuba
+
+2. At the password prompt, enter the personal access token. (4ce76d6d-c835-4dc9-9877-6c60d583a05f)
