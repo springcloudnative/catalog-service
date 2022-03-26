@@ -33,6 +33,7 @@ services:
     image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
     container_name: catalog-service
     environment:
+      BPL_JVM_THREAD_COUNT: 50
       SPRING_DATASOURCE_URL: jdbc:mysql://polar_mysql_catalog:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'password'
