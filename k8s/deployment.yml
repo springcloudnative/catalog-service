@@ -1,33 +1,26 @@
-apiVersion: apps/v1                   # The API version for Deployment objects
-kind: Deployment                      # The type of object to create
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: polar-mysql-catalog           # The name of the deployment
-  labels:                             # A set of labels attached to the Deployment
-    app: catalog-service              # This Deployment is labeled with "app=catalog-service"
+  name: catalog-service
+  labels:
+    app: catalog-service
 spec:
-  selector:                           # Defines the labels used to select the Pods to scale
+  selector:
     matchLabels:
       app: catalog-service
-  template:                           # The template for creating a Pod
+  template:
     metadata:
-      labels:                         # Labels attached to the Pod object. They should match the ones used as selectors
+      labels:
         app: catalog-service
     spec:
-      containers:                     # The list of containers in the Pod. Only one in this case
-        - name: catalog-service       # The name of the Pod
+      containers:
+        - name: catalog-service
           image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
-          imagePullPolicy: Always # Instructs Kubernetes to always check the container registry for image updates
+          imagePullPolicy: Always
           ports:
-            - containerPort: 9001 # The ports exposed by the container
-          env:                    # The list of environment variables passed to the Pod
-            - name: BPL_JVM_THREAD_COUNT  # Paketo Buildpacks environment variable to configure the number of threads for memory calculation
+            - containerPort: 9001
+          env:
+            - name: BPL_JVM_THREAD_COUNT
               value: "50"
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://polar_mysql_catalog:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
-          resources:
-            requests:
-              cpu: 100m
-              memory: 60Mi
-            limits:
-              cpu: 200m
-              memory: 120Mi
