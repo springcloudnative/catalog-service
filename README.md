@@ -290,3 +290,18 @@ package an application as a Docker image if it fails to compile. A job is made u
 and based on Ubuntu, but you can also choose other operating systems or host your own runner.
 
 Workflows should be defined in a *.github/workflows* folder in your Git repository root. You can define one or more workflows.
+
+# Creating a Deployment for a Spring Boot application
+A Kubernetes manifest usually comprises four main sections:
+* **apiVersion** defines the versioned schema of the specific object representation. Core resources such as Pods or Services follow a versioned schema composed of only a
+version number (such as *v1*). Other resources like Deployments or ReplicaSet follow a versioned schema consisting of a group and a version number (for example, apps/v1). If
+in doubt about which version to use, you can refer to the Kubernetes documentation (kubernetes.io/docs) or use the kubectl explain <object_name> command to get more
+information about the object, including the API version to use.
+* **kind** is the type of Kubernetes object you want to create, such as Pod, ReplicaSet, Deployment, or Service. You can use the *kubectl api-resources* command to list all
+the objects supported by the cluster.
+* **metadata** provides details about the object you want to create, including the name and a set of labels (key/value pairs) used for categorization. For example, you can instruct
+Kubernetes to replicate all the objects with a specific label attached.
+* **spec** is a section specific to each object type and is used to declare the desired configuration.
+
+The *spec* section of a Deployment manifest contains a *selector* part to define a strategy for identifying which objects should be scaled by a ReplicaSet (more on this later) and a *template*
+part describing the specifications for creating the desired Pod and containers.
