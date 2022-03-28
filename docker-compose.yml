@@ -1,4 +1,4 @@
-version: '3.3'
+version: '2.1'
 
 services:
   polar_mysql_catalog:
@@ -15,7 +15,12 @@ services:
     expose:
       - '3306'
     volumes:
-      - my-db:/var/lib/mysql:z
+      - ./polar_mysql_db:/var/lib/mysql:z
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h",  "localhost"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     networks:
       - catalog-network
 
@@ -29,6 +34,15 @@ services:
     networks:
       - catalog-network
 
+  config-service:
+    build: ./config-service
+    image: ernestoacostacuba/config-service:0.0.1-SNAPSHOT
+    container_name: config-service
+    ports:
+      - '8888:8888'
+    networks:
+      - catalog-network
+
   catalog-service:
     image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
     container_name: catalog-service
@@ -37,19 +51,16 @@ services:
       BPL_DEBUG_PORT: 8001      # Debug connections are accepted via a socket on port 8001
       BPL_JVM_THREAD_COUNT: 50
       SPRING_DATASOURCE_URL: jdbc:mysql://polar_mysql_catalog:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_CLOUD_CONFIG_URI: http://config-service:8888
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'password'
       MYSQL_ROOT_PASSWORD: 'password'
-      WAIT_HOSTS: polar_mysql_catalog:3306
-      WAIT_HOSTS_TIMEOUT: 300
-      WAIT_SLEEP_INTERVAL: 30
-      WAIT_HOST_CONNECT_TIMEOUT: 30
     ports:
       - '8001:8001' # The port where the JVM will listen for debug connections
       - '9001:9001'
     depends_on:
-      - polar_mysql_catalog
-    command: sh -c "/wait && java -Djava.security.egd=file:/dev/./urandom -jar /catalog-service.jar"
+      polar_mysql_catalog:
+        condition: service_healthy
     networks:
       - catalog-network
 

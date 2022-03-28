@@ -269,3 +269,24 @@ To use the access token from your Docker CLI client:
 1. Run docker login -u ernestoacostacuba
 
 2. At the password prompt, enter the personal access token. (4ce76d6d-c835-4dc9-9877-6c60d583a05f)
+
+# Understanding workflows for building automated pipelines
+GitHub actions provide you with a YAML format to describe your automated pipelines that you can compose using the following items as building blocks.
+
+* **Workflow**. A configurable, automated process comprised of one or more *jobs* and defined in a YAML file. You can use a workflow to model continuous integration and continuous
+delivery pipelines. Each workflow is configured to be triggered when one or more *events* happen.
+
+* **Event**. The activity that triggers the execution of a workflow. For example, you can define a workflow to be run whenever someone pushes a commit or merge a pull request
+to the main branch.
+
+* **Job**. A unit of work in a workflow. Jobs run in parallel by default, but you can configure them to run in sequence by specifying dependencies. For example, you don’t want to
+package an application as a Docker image if it fails to compile. A job is made up of one or more *steps*.
+
+* **Step**. An individual task run as part of a job. Steps in a job run sequentially. The commands run by a step are called *actions*.
+
+* **Action**. A command run as part of a step. It’s the smallest unit of work in a workflow. You can use the actions created by the GitHub community or build your own.
+
+* **Runner**. A server that has the GitHub Actions runner applications installed and, therefore, can run jobs. For the Polar Bookshop application, you’ll use a runner hosted on GitHub
+and based on Ubuntu, but you can also choose other operating systems or host your own runner.
+
+Workflows should be defined in a *.github/workflows* folder in your Git repository root. You can define one or more workflows.

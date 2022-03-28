@@ -149,10 +149,11 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<layers>
-						<enabled>true</enabled>
+						<enabled>false</enabled>
 					</layers>
 					<image>
 						<name>${registryUsername}/${project.name}:${project.version}</name>
+						<publish>true</publish>
 						<env>
 							<BP_JVM_VERSION>11</BP_JVM_VERSION>
 						</env>
@@ -163,6 +164,11 @@
 							<password>${registryToken}</password>
 							<url>${registryUrl}</url>
 						</builderRegistry>
+						<publishRegistry>
+							<username>${registryUsername}</username>
+							<password>${registryToken}</password>
+							<url>${registryUrl}</url>
+						</publishRegistry>
 					</docker>
 				</configuration>
 				<executions>
