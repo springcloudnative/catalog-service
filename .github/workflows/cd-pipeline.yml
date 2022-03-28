@@ -1,0 +1,46 @@
+# In this pipeline the continuous deployment
+# will be accomplished by two jobs:
+# - a build job responsible for compiling and testing the application
+# - a package job responsible for packaging the application as a container image
+#   and pushing it to Docker Hub.
+name: CD Pipeline
+on:
+  push:       # The event that triggers the workflow execution: after a push on the main branch.
+    branches:
+      - main
+      - polar-bookshop
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: maven
+      - name: Compile and testing application
+        run: |
+          chmod +x mvnw
+          ./mvnw test package
+  package:
+    name: Package
+    needs: [build]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: maven
+      - name: Containerize and publish image
+        run: |
+          chmod +x mvnw
+          ./mvnw spring-boot:build-image -DREGISTRY_URL=${{ secrets.REGISTRY_URL }} -DREGISTRY_USERNAME=${{ secrets.REGISTRY_USERNAME }} -DREGISTRY_TOKEN=${{ secrets.REGISTRY_TOKEN }} -Dspring-boot.build-image.publish=true -DskipTests=true

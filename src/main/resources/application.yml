@@ -1,0 +1,44 @@
+server:
+  port: 9001  # HTTP port
+  tomcat:
+    connection-timeout: 2s  # Connection timeout
+    threads:
+      max: 50
+      min-spare: 5  # how many threads are created at startup
+
+spring:
+  application:
+    name: catalog-service
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+      request-connect-timeout: 2000 # Timeout on waiting to connect to the config server (ms)
+      request-read-timeout: 5000    # Timeout on waiting to read configuration data from the config server (ms)
+      fail-fast: false
+      retry:
+        max-attempts: 6
+        initial-interval: 1000 # 1s
+        max-interval: 2000 # 2s
+        multiplier: 1.1
+  profiles:
+    active: testdata
+  datasource:
+    url: jdbc:mysql://localhost:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
+    username: user
+    password: password
+    platform: mysql
+    hikari:
+      connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
+      maximum-pool-size: 5      # The maximum number of connections Hikari CP will keep in the pool
+      connectionTestQuery: SELECT 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+polar:
+  greeting: Welcome to the local book catalog!
