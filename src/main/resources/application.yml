@@ -1,14 +1,17 @@
 server:
-  port: 9001  # HTTP port
+  port: 9001                # HTTP port
+  shutdown: graceful        # Enable graceful shutdown
   tomcat:
     connection-timeout: 2s  # Connection timeout
     threads:
       max: 50
-      min-spare: 5  # how many threads are created at startup
+      min-spare: 5          # how many threads are created at startup
 
 spring:
   application:
     name: catalog-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
   config:
     import: "optional:configserver:"
   cloud:

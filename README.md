@@ -325,3 +325,56 @@ $ kubectl port-forward service/catalog-service 9001:80
 Forwarding from 127.0.0.1:9001 -> 9001
 Forwarding from [::1]:9001 -> 9001
 ```
+
+# Ensuring disposability: Fast startup
+Fast startup is relevant in a cloud environment because applications are disposable and frequently created, destroyed, and scaled. The quicker the startup, the sooner a new application instance is
+ready to accept connections.
+Standard applications like microservices are good with a startup time in the range of a few seconds. On the other hand, serverless applications usually require a faster startup phase in the
+range of milliseconds rather than seconds. Spring Boot covers both needs, but the second use case requires some extra work.
+
+# Ensuring disposability: Graceful shutdown
+Gracefully shutting down means the application stops accepting new requests, completes all those still in progress, and closes any open resource like database
+connections.
+All the embedded servers available in Spring Boot support a graceful shutdown mode but in slightly different ways. Tomcat, Jetty, and Netty stop accepting new requests entirely when the
+shutdown signal is received. On the other hand, Undertow keeps accepting new requests but immediately replies with an HTTP 503 response.
+By default, Spring Boot stops the server immediately after receiving a termination signal (*SIGTERM*). You can switch to a graceful mode by configuring SIGTERM the *server.shutdown* property.
+You can also configure the *grace period*, which is how long the application is allowed to process all the pending requests. After the grace period expires, the application is terminated even if there
+are still pending requests. By default, the grace period is 30 seconds. You can change it through the *spring.lifecycle.timeout-per-shutdown-phase* property.
+**application.yml**
+```
+server:
+    port: 9001
+    shutdown: graceful
+    tomcat:
+        connection-timeout: 2s
+        threads:
+            max: 50
+            min-spare: 5
+spring:
+    application:
+        name: catalog-service
+    lifecycle:
+        timeout-per-shutdown-phase: 15s
+```
+
+After enabling application support for graceful shutdown, you need to update the Deployment manifest accordingly.
+
+The recommended solution is to delay sending the *SIGTERM* signal to the Pod so that Kubernetes has enough time to spread the news across the cluster. By doing so, when the Pod starts the
+graceful shutdown procedure, all Kubernetes components already know not to send new requests to it. Technically, the delay can be configured through a *preStop* hook.
+**catalog-service/k8s/deployment.yml**
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: catalog-service
+...    
+
+            containers:
+            - name: catalog-service
+              image: polarbookshop/catalog-service:0.0.1-SNAPSHOT
+              imagePullPolicy: Always
+              lifecycle:
+                preStop:
+                    exec:
+                        command: [ "sh", "-c", "sleep 5" ]
+```

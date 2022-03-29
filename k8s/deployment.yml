@@ -19,7 +19,7 @@ spec:
           image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
           imagePullPolicy: Always
           lifecycle:
-            preStop:
+            preStop:  # Makes K8 wait 5 seconds before sending the SIGTERM signal to the Pod
               exec:
                 command: [ "sh", "-c", "sleep 5" ]
           ports:
@@ -30,7 +30,7 @@ spec:
             - name: SPRING_CLOUD_CONFIG_URI
               value: http://config-service:8888
             - name: DB_HOST
-              value: mysql-catalog
+              value: polar-mysql-catalog
             - name: DB_NAME
               value: polardb_catalog
             - name: DB_USERNAME
