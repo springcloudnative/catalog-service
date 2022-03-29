@@ -5,6 +5,7 @@ metadata:
   labels:
     app: catalog-service
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: catalog-service
@@ -17,10 +18,38 @@ spec:
         - name: catalog-service
           image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
           imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
           ports:
             - containerPort: 9001
           env:
             - name: BPL_JVM_THREAD_COUNT
               value: "50"
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:mysql://polar_mysql_catalog:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: http://config-service:8888
+            - name: DB_HOST
+              value: mysql-catalog
+            - name: DB_NAME
+              value: polardb_catalog
+            - name: DB_USERNAME
+              value: user
+            - name: DB_PASSWORD
+              value: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+  labels:
+    app: catalog-service
+spec:
+  type: ClusterIP
+  selector:
+    app: catalog-service
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 9001

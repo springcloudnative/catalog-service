@@ -305,3 +305,23 @@ Kubernetes to replicate all the objects with a specific label attached.
 
 The *spec* section of a Deployment manifest contains a *selector* part to define a strategy for identifying which objects should be scaled by a ReplicaSet (more on this later) and a *template*
 part describing the specifications for creating the desired Pod and containers.
+
+# Exposing Spring Boot applications with Kubernetes Services
+Kubernetes Services let you expose a set of Pods via an interface that other applications can call without knowing the details about the single Pod
+instances. This model provides applications with transparent service discovery and load balancing functionality.
+There are different types of Services depending on which access policy you want to enforce for the application. The default and most common type is called ClusterIP and exposes a
+set of Pods to the cluster. It’s what makes it possible for Pods to communicate with each other (for example, Catalog Service and MySQL).
+
+Four pieces of information characterize a ClusterIP Service:
+* the label used to match all the Pods that should be targeted and exposed by the Service (selector);
+* the network protocol used by the Service;
+* the port on which the Service is listening (we’re going to use port 80 for all Services);
+* the targetPort, that is the port exposed by the targeted Pods to which Service will forward requests.
+
+Once the Service is created, we can expose the application to the outside of the cluster relying on the port forwarding feature offered by Kubernetes to expose an
+object (in this case, a Service) to your local machine:
+```
+$ kubectl port-forward service/catalog-service 9001:80
+Forwarding from 127.0.0.1:9001 -> 9001
+Forwarding from [::1]:9001 -> 9001
+```
