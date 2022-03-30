@@ -31,6 +31,7 @@
 		<registryToken>${REGISTRY_TOKEN}</registryToken>
 		<!--The container registry URL. The value is passed as a Maven property.-->
 		<registryUrl>${REGISTRY_URL}</registryUrl>
+		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -144,7 +145,7 @@
 
 	<build>
 		<plugins>
-			<plugin>
+<!--			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
@@ -178,34 +179,90 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 
 			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>${sonar-maven-plugin.version}</version>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin.version}</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>prepare-agent</id>
 						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<goals>
-							<goal>report</goal>
+							<goal>build-info</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>jib</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>${jib-maven-plugin.version}</version>
+						<configuration>
+							<container>
+								<ports>
+									<port>9001</port>
+								</ports>
+							</container>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>remote</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<layers>
+								<enabled>true</enabled>
+							</layers>
+							<image>
+								<name>${registryUsername}/${project.name}:${project.version}</name>
+								<publish>true</publish>
+								<env>
+									<BP_JVM_VERSION>11</BP_JVM_VERSION>
+								</env>
+							</image>
+							<docker>
+								<builderRegistry>
+									<username>${registryUsername}</username>
+									<password>${registryToken}</password>
+									<url>${registryUrl}</url>
+								</builderRegistry>
+								<publishRegistry>
+									<username>${registryUsername}</username>
+									<password>${registryToken}</password>
+									<url>${registryUrl}</url>
+								</publishRegistry>
+							</docker>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>build-image</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
