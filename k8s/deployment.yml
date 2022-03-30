@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: catalog-service
-          image: ernestoacostacuba/catalog-service:0.0.1-SNAPSHOT
-          imagePullPolicy: Always
+          image: ernestoacostacuba/catalog-service
+          imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:  # Makes K8 wait 5 seconds before sending the SIGTERM signal to the Pod
               exec:
@@ -28,7 +28,7 @@ spec:
             - name: BPL_JVM_THREAD_COUNT
               value: "50"
             - name: SPRING_CLOUD_CONFIG_URI
-              value: http://config-service:8888
+              value: http://config-service
             - name: DB_HOST
               value: polar-mysql-catalog
             - name: DB_NAME

@@ -378,3 +378,44 @@ metadata:
                     exec:
                         command: [ "sh", "-c", "sleep 5" ]
 ```
+
+# Local Kubernetes development with Skaffold and Octant
+These tools are used to set up a local Kubernetes development workflow to automate steps like building images and applying manifests to a Kubernetes cluster.
+It’s part of what is defined as the *inner loop* of working with a Kubernetes platform.
+Using Skaffold, you can focus on the business logic of your applications rather than on all those infrastructural concerns, and Octant is used to visualize and 
+manage the Kubernetes objects through a convenient GUI.
+
+# Defining a development workflow on Kubernetes with Skaffold
+Skaffold is a tool developed by Google that "handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code". You can
+find instructions on how to install it on the official website: skaffold.dev.
+The goal is to design a workflow that will automate the following steps for you:
+* packaging a Spring Boot application as a container image using Cloud Native Buildpacks;
+* uploading the image to a Kubernetes cluster created with kind;
+* creating all the Kubernetes objects described in the YAML manifests;
+* enabling the port-forward functionality to access applications from your local computer;
+* collecting the logs from the application and showing them in your console.
+
+# Configuring Skaffold for building and deploying
+You can initialize Skaffold in a new project using the skaffold init command and choosing a strategy for building the application.
+Navigate to the project root folder, and run the following command:
+```
+$ skaffold init --XXenableBuildpacksInit
+```
+
+The resulting configuration will be saved in a *skaffold.yaml* file created in your project root folder. If it doesn’t show up in your IDE, try refreshing the project. So far, we’ve been using the
+.yml extension for YAML files. To be consistent, go ahead and rename the Skaffold configuration file to *skaffold.yml*.
+The *build* part describes how you want to package the application. The *deploy* part specifies what you want to deploy.
+
+# Deploying applications to K8 with Skaffold
+The first option for running Skaffold is the development mode, which builds and deploys the objects you configured in *skaffold.yml*, and then starts watching the project source code.
+When something changes, it rolls out the updated objects in your local Kubernetes cluster automatically.
+In the project root folder:
+```
+$ skaffold dev --port-forward
+```
+
+The --port-forward flag will set up automatic port forwarding to your local machine. Information on which port is forwarded is printed out at the end of the task.
+Unless it’s not available, Skaffold will use the port you defined for the Service object.
+When you’re done working with the application, you can terminate the Skaffold process (Ctrl+C), and all the Kubernetes objects will get deleted automatically.
+Another option for running Skaffold is using the command. *skaffold run*. It works like the development mode, but it doesn’t provide live-reload nor clean up when it terminates. It’s
+typically used in a CI/CD pipeline.
