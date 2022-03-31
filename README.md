@@ -419,3 +419,42 @@ Unless it’s not available, Skaffold will use the port you defined for the Serv
 When you’re done working with the application, you can terminate the Skaffold process (Ctrl+C), and all the Kubernetes objects will get deleted automatically.
 Another option for running Skaffold is using the command. *skaffold run*. It works like the development mode, but it doesn’t provide live-reload nor clean up when it terminates. It’s
 typically used in a CI/CD pipeline.
+
+# Asynchronous and non-blocking architectures with Reactor and Spring
+The Reactive Manifesto (www.reactivemanifesto.org/) describes a reactive system as responsive, resilient, elastic, and message-driven. Its mission to build loosely-coupled, scalable, resilient, and
+cost-effective applications is fully compatible with our definition of cloud native. The new part is achieving that goal by using an asynchronous and non-blocking communication paradigm based
+on message-passing.
+
+## From thread-per-request to event loop
+Non-reactive applications allocate a thread per request. Until a response is returned, the thread will not be used for anything. This is the *thread-per-request* model.
+In the end, this paradigm sets constraints on the application scalability and doesn’t use computational resources in the most efficient way
+possible.
+
+Reactive applications are more scalable and efficient by design. Handling requests in a reactive application doesn’t involve allocating a given thread exclusively, but it’s fulfilled
+asynchronously based on events. For example, if a database read is required, the thread handling that part of the flow will not wait until data is returned from the database. Instead, a callback is
+registered, and whenever the information is ready, a notification is sent, and one of the available threads will execute the callback. During that time, the thread can be used to process other
+requests rather than waiting idle.
+This paradigm, called *event loop*, doesn’t set hard constraints on the application event loop scalability. It actually makes it easier to scale since an increase in the number of concurrent requests does not
+strictly depend on the number of threads. As a matter of fact, a default configuration for reactive applications in Spring is to use only one thread per CPU core. With the non-blocking I/O
+capability and a communication paradigm based on events, reactive applications allow more efficient utilization of computational resources.
+
+One of the essential features of reactive applications is to provide non-blocking backpressure (also called *control flow*). It means that consumers can control the amount control flow of data received to
+lower the risk of producers sending more data than the consumer can handle and causing a DoS attack, slowing the application, cascading the failure or even leading to a total crash.
+
+The reactive paradigm is a solution to the problem of blocking I/O operations that require more threads to handle high concurrency and may lead to slow or entirely unresponsive applications.
+Sometimes the paradigm is mistaken as a way to increase the speed of an application. Reactive is about improving scalability and resilience, not speed.
+
+However, you should also be aware of the additional complexity introduced by such a paradigm. Besides requiring a mindset shift to think in an event-driven way, reactive applications are more
+challenging to debug and troubleshoot because of the asynchronous I/O. Before rushing to rewriting all your applications to make them reactive, think twice if that’s necessary and consider
+both benefits and drawbacks.
+
+## Project Reactor: Reactive streams with Mono and Flux
+Conceptually, reactive streams resemble the Java Stream API in the way of building data pipelines. One of the key differences is that a Java stream is pull-based: consumers process data
+in an imperative and synchronous fashion. Instead, reactive streams are push-based: consumers are notified by the producers when new data is available, so the processing happens
+asynchronously.
+Reactive streams work according to a producer/consumer paradigm. Producers are called *publishers*. They produce data that might be eventually available. Reactor provides publishers two central
+APIs implementing the *Producer<T>* interface for objects of type *<T>* and used to compose asynchronous, observable data streams: *Mono<T>* and *Flux<T>*.
+Consumers are called *subscriber*s because they subscribe to a publisher and are notified whenever new data is available. As part of the *subscription*, consumers can also define
+backpressure by informing the publisher they can process only a certain amount of data at a time.
+That is a powerful feature that puts consumers in control of how much data is received, preventing them from being overwhelmed and becoming unresponsive. Reactive streams are
+activated only if there’s a subscriber.
