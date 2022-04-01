@@ -458,3 +458,9 @@ Consumers are called *subscriber*s because they subscribe to a publisher and are
 backpressure by informing the publisher they can process only a certain amount of data at a time.
 That is a powerful feature that puts consumers in control of how much data is received, preventing them from being overwhelmed and becoming unresponsive. Reactive streams are
 activated only if there’s a subscriber.
+
+## Understanding the Spring reactive stack
+When you build applications with Spring, you can choose between a servlet stack and a reactive stack.
+The servlet stack is based on the Servlet API and a Servlet container (e.g., Tomcat). In contrast, the reactive model is based on the Reactive Streams API (implemented by Project Reactor) and
+either Netty or a Servlet container (version 3.1 as a minimum). Both stacks let you build RESTful applications using either classes annotated as @RestController
+or functional endpoints called Router Functions. The servlet stack uses Spring MVC, while the reactive stack uses Spring WebFlux.

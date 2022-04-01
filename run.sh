@@ -31,7 +31,7 @@ function start_infra() {
 
 function build_image() {
   echo 'Building image with Buildpacks....'
-  ./mvnw spring-boot:build-image -DREGISTRY_URL=$1 -DREGISTRY_USERNAME=$2 -DREGISTRY_TOKEN=$3 -DskipTests=true
+  ./mvnw spring-boot:build-image -Premote -DREGISTRY_URL=$1 -DREGISTRY_USERNAME=$2 -DREGISTRY_TOKEN=$3 -DskipTests=true
 }
 
 function start_all() {

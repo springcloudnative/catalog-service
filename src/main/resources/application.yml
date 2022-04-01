@@ -28,9 +28,9 @@ spring:
   profiles:
     active: testdata
   datasource:
-    url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:catalog_user}
+    password: ${DB_PASSWORD:Y2F0YWxvZ191c2VyCg==}
     hikari:
       initialization-fail-timeout: 0
       connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
