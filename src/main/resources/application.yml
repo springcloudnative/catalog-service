@@ -36,6 +36,8 @@ spring:
       connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
       maximum-pool-size: 5      # The maximum number of connections Hikari CP will keep in the pool
       connectionTestQuery: SELECT 1
+  flyway:
+    baseline-on-migrate: true
 
 management:
   endpoints:

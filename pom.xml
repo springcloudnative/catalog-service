@@ -25,11 +25,14 @@
 		<testcontainersVersion>1.16.3</testcontainersVersion>
 		<!--The username to use when authenticating with the container registry. The value is
 		passed as a Maven property-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryUsername>${REGISTRY_USERNAME}</registryUsername>
 		<!--The token to use when authenticating with the container registry. The value is
 		passed as a Maven property.-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryToken>${REGISTRY_TOKEN}</registryToken>
 		<!--The container registry URL. The value is passed as a Maven property.-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryUrl>${REGISTRY_URL}</registryUrl>
 		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 	</properties>

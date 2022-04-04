@@ -1,4 +1,4 @@
-CREATE TABLE books (
+CREATE TABLE IF NOT EXISTS books (
     id bigint(20) NOT NULL AUTO_INCREMENT,
     author varchar(255) NOT NULL,
     isbn varchar(255) UNIQUE NOT NULL,
