@@ -1,4 +1,4 @@
 spring:
   datasource:
     url: jdbc:tc:mysql:8.0:///
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+#    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

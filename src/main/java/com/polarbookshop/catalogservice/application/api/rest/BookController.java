@@ -2,18 +2,22 @@ package com.polarbookshop.catalogservice.application.api.rest;
 
 import com.polarbookshop.catalogservice.application.service.BookService;
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("books")
 public class BookController {
 
     private final BookService bookService;
+
+    @Autowired
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     @GetMapping
     public Iterable<BookAggregate> get() {

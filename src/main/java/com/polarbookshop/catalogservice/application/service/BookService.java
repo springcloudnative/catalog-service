@@ -2,9 +2,11 @@ package com.polarbookshop.catalogservice.application.service;
 
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
 
+import java.util.List;
+
 public interface BookService {
 
-    Iterable<BookAggregate> viewBookList();
+    List<BookAggregate> viewBookList();
     BookAggregate viewBookDetails(String isbn);
     BookAggregate addBookToCatalog(BookAggregate book);
     void removeBookFromCatalog(String isbn);

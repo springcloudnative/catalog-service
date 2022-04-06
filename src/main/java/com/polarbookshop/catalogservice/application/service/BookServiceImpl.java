@@ -6,7 +6,7 @@ import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
 import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
 import com.polarbookshop.catalogservice.infrastructure.repository.BookRepository;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -17,12 +17,13 @@ import java.util.stream.StreamSupport;
 
 @Data
 @Service
+@Primary
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
     @Override
-    public Iterable<BookAggregate> viewBookList() {
+    public List<BookAggregate> viewBookList() {
         Iterable<BookEntity> bookEntities = bookRepository.findAll();
         Iterator<BookEntity> iterator = bookRepository.findAll().iterator();
         Iterable<BookEntity> iterable = () -> iterator;
@@ -52,8 +53,16 @@ public class BookServiceImpl implements BookService {
         if (bookRepository.existsByIsbn(book.getIsbn())) {
             throw new BookAlreadyExistsException(book.getIsbn());
         }
-        BookEntity bookEntity = new BookEntity();
-        BeanUtils.copyProperties(book, bookEntity);
+
+        BookEntity bookEntity = BookEntity.build(
+                book.getIsbn(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getPrice(),
+                book.getPublisher()
+        );
+
+//        BeanUtils.copyProperties(book, bookEntity);
 
         return bookRepository.save(bookEntity).toBookAggregate();
     }

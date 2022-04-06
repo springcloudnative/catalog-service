@@ -28,6 +28,7 @@ spring:
   profiles:
     active: testdata
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:catalog_user}
     password: ${DB_PASSWORD:Y2F0YWxvZ191c2VyCg==}
@@ -37,7 +38,9 @@ spring:
       maximum-pool-size: 5      # The maximum number of connections Hikari CP will keep in the pool
       connectionTestQuery: SELECT 1
   flyway:
+    table: catalog_service_flyway_schema_history
     baseline-on-migrate: true
+    baseline-version: 0
 
 management:
   endpoints:
