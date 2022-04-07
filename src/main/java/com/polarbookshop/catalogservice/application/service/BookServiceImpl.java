@@ -20,12 +20,12 @@ import java.util.stream.StreamSupport;
 @Primary
 public class BookServiceImpl implements BookService {
 
-    private final BookRepository bookRepository;
+    private final BookRepository bookJdbcRepository;
 
     @Override
     public List<BookAggregate> viewBookList() {
-        Iterable<BookEntity> bookEntities = bookRepository.findAll();
-        Iterator<BookEntity> iterator = bookRepository.findAll().iterator();
+        Iterable<BookEntity> bookEntities = bookJdbcRepository.findAll();
+        Iterator<BookEntity> iterator = bookJdbcRepository.findAll().iterator();
         Iterable<BookEntity> iterable = () -> iterator;
 
         List<BookEntity> bookEntitiesList = StreamSupport
@@ -39,7 +39,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookAggregate viewBookDetails(String isbn) {
-        Optional<BookEntity> book = bookRepository.findByIsbn(isbn);
+        Optional<BookEntity> book = bookJdbcRepository.findByIsbn(isbn);
 
         if (book.isPresent()) {
             return book.get().toBookAggregate();
@@ -50,7 +50,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookAggregate addBookToCatalog(BookAggregate book) {
-        if (bookRepository.existsByIsbn(book.getIsbn())) {
+        if (bookJdbcRepository.existsByIsbn(book.getIsbn())) {
             throw new BookAlreadyExistsException(book.getIsbn());
         }
 
@@ -64,21 +64,21 @@ public class BookServiceImpl implements BookService {
 
 //        BeanUtils.copyProperties(book, bookEntity);
 
-        return bookRepository.save(bookEntity).toBookAggregate();
+        return bookJdbcRepository.save(bookEntity).toBookAggregate();
     }
 
     @Override
     public void removeBookFromCatalog(String isbn) {
-        if (!bookRepository.existsByIsbn(isbn)) {
+        if (!bookJdbcRepository.existsByIsbn(isbn)) {
             throw new BookNotFoundException(isbn);
         }
 
-        bookRepository.deleteByIsbn(isbn);
+        bookJdbcRepository.deleteByIsbn(isbn);
     }
 
     @Override
     public BookAggregate editBookDetails(String isbn, BookAggregate book) {
-        Optional<BookEntity> existingBook = bookRepository.findByIsbn(isbn);
+        Optional<BookEntity> existingBook = bookJdbcRepository.findByIsbn(isbn);
 
         if (existingBook.isEmpty()) {
             return addBookToCatalog(book);
@@ -96,6 +96,6 @@ public class BookServiceImpl implements BookService {
                 existingBook.get().getVersion()
         );
 
-        return bookRepository.save(bookToUpdate).toBookAggregate();
+        return bookJdbcRepository.save(bookToUpdate).toBookAggregate();
     }
 }

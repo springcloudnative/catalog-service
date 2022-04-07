@@ -17,7 +17,7 @@ public class BeansConfiguration {
     }
 
     @Bean
-    MySqlDbCatalogRepository booksJdbcRepository(SpringDataPostgresCatalogRepository bookRepository) {
+    MySqlDbCatalogRepository bookJdbcRepository(SpringDataPostgresCatalogRepository bookRepository) {
         return new MySqlDbCatalogRepository(bookRepository);
     }
 }
