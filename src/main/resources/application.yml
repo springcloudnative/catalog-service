@@ -13,7 +13,8 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 15s # Defines a 15s grace period
   config:
-    import: "optional:configserver:"
+    active:
+      on-profile: testdata
   cloud:
     config:
       uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
@@ -25,8 +26,6 @@ spring:
         initial-interval: 1000 # 1s
         max-interval: 2000 # 2s
         multiplier: 1.1
-  profiles:
-    active: testdata
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
@@ -41,6 +40,32 @@ spring:
     table: catalog_service_flyway_schema_history
     baseline-on-migrate: true
     baseline-version: 0
+
+---
+
+spring:
+  application:
+    name: catalog-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
+  cloud:
+    config:
+      enabled: false
+      import: "optional:configserver:"
+  config:
+    activate:
+      on-profile: integration
+  flyway:
+    table: catalog_service_flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+
+logging:
+  level:
+    root: ERROR
+    com.github.dockerjava: ERROR
+    org.springframework.test.context: INFO
+---
 
 management:
   endpoints:

@@ -464,3 +464,28 @@ When you build applications with Spring, you can choose between a servlet stack 
 The servlet stack is based on the Servlet API and a Servlet container (e.g., Tomcat). In contrast, the reactive model is based on the Reactive Streams API (implemented by Project Reactor) and
 either Netty or a Servlet container (version 3.1 as a minimum). Both stacks let you build RESTful applications using either classes annotated as @RestController
 or functional endpoints called Router Functions. The servlet stack uses Spring MVC, while the reactive stack uses Spring WebFlux.
+
+# Resilient applications with Reactive Spring
+Resilience is about keeping a system available and delivering its services, even when failures happen. Since failures will happen and there’s no way to prevent them all, it becomes critical to
+design fault-tolerant applications. The goal is to keep the system available without the user noticing. In the worst-case scenario, it could have degraded functionality, but it should still be
+available.
+
+## Timeouts
+Whenever your application calls a remote service, you don’t know if and when a response will be received. Timeouts (also called *time limiters*) are a simple, yet effective tool time limiters to preserve the
+responsiveness of your application in case a response is not received within a reasonable time period.
+
+Two main reasons for setting up timeouts are:
+* if you don’t limit the time your client waits, you risk your computational resources being blocked for too long (for imperative applications). In the worst-case scenario, your
+application will be completely unresponsive because all the available threads are blocked, waiting for a response from a remote service, so there’s no thread available to handle new
+requests anymore;
+* if you can’t meet your Service Level Agreements (SLAs), there’s no reason to keep waiting for an answer, better to fail the request.
+
+Examples of timeouts are:
+* **Connection timeout**. It’s the time limit for establishing a communication channel with a remote resource. Earlier, you configured the server.netty.connection-timeout
+property to limit the time Netty waits for a request to be received after accepting the initial connection.
+* **Connection pool timeout**. It’s the time limit for a client to get a connection from a pool (timeout for the Hikari connection pool through the spring.datasource.hikari.connection-timeout property.
+
+* **Read timeout**. It’s the time limit to read from a remote resource after establishing the initial connection.
+
+You can also specify a failover instead of throwing the exception: When a response is received from the remote service within the time limit, the request is
+successful. If the timeout expires and no response is received, then a fallback behavior is executed, if any. Otherwise, an exception is thrown.
