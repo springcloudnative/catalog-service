@@ -193,7 +193,7 @@
 				<artifactId>flyway-maven-plugin</artifactId>
 			</plugin>-->
 
-			<plugin>
+<!--			<plugin>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-contract-maven-plugin</artifactId>
 				<version>3.1.1</version>
@@ -201,7 +201,18 @@
 				<configuration>
 					<baseClassForTests>com.polarbookshop.catalogservice.application.api.rest.BaseTest</baseClassForTests>
 				</configuration>
-			</plugin>
+			</plugin>-->
+
+<!--			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<testEnvironment>true</testEnvironment>
+					</systemPropertyVariables>
+					<argLine>-Dspring.profiles.active=integration</argLine>
+				</configuration>
+			</plugin>-->
 		</plugins>
 	</build>
 

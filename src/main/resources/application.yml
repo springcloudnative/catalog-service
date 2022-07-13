@@ -60,13 +60,6 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
 
-logging:
-  level:
-    root: ERROR
-    com.github.dockerjava: ERROR
-    org.springframework.test.context: INFO
----
-
 management:
   endpoints:
     web:
