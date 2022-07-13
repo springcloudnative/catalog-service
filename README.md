@@ -290,3 +290,202 @@ package an application as a Docker image if it fails to compile. A job is made u
 and based on Ubuntu, but you can also choose other operating systems or host your own runner.
 
 Workflows should be defined in a *.github/workflows* folder in your Git repository root. You can define one or more workflows.
+
+# Creating a Deployment for a Spring Boot application
+A Kubernetes manifest usually comprises four main sections:
+* **apiVersion** defines the versioned schema of the specific object representation. Core resources such as Pods or Services follow a versioned schema composed of only a
+version number (such as *v1*). Other resources like Deployments or ReplicaSet follow a versioned schema consisting of a group and a version number (for example, apps/v1). If
+in doubt about which version to use, you can refer to the Kubernetes documentation (kubernetes.io/docs) or use the kubectl explain <object_name> command to get more
+information about the object, including the API version to use.
+* **kind** is the type of Kubernetes object you want to create, such as Pod, ReplicaSet, Deployment, or Service. You can use the *kubectl api-resources* command to list all
+the objects supported by the cluster.
+* **metadata** provides details about the object you want to create, including the name and a set of labels (key/value pairs) used for categorization. For example, you can instruct
+Kubernetes to replicate all the objects with a specific label attached.
+* **spec** is a section specific to each object type and is used to declare the desired configuration.
+
+The *spec* section of a Deployment manifest contains a *selector* part to define a strategy for identifying which objects should be scaled by a ReplicaSet (more on this later) and a *template*
+part describing the specifications for creating the desired Pod and containers.
+
+# Exposing Spring Boot applications with Kubernetes Services
+Kubernetes Services let you expose a set of Pods via an interface that other applications can call without knowing the details about the single Pod
+instances. This model provides applications with transparent service discovery and load balancing functionality.
+There are different types of Services depending on which access policy you want to enforce for the application. The default and most common type is called ClusterIP and exposes a
+set of Pods to the cluster. It’s what makes it possible for Pods to communicate with each other (for example, Catalog Service and MySQL).
+
+Four pieces of information characterize a ClusterIP Service:
+* the label used to match all the Pods that should be targeted and exposed by the Service (selector);
+* the network protocol used by the Service;
+* the port on which the Service is listening (we’re going to use port 80 for all Services);
+* the targetPort, that is the port exposed by the targeted Pods to which Service will forward requests.
+
+Once the Service is created, we can expose the application to the outside of the cluster relying on the port forwarding feature offered by Kubernetes to expose an
+object (in this case, a Service) to your local machine:
+```
+$ kubectl port-forward service/catalog-service 9001:80
+Forwarding from 127.0.0.1:9001 -> 9001
+Forwarding from [::1]:9001 -> 9001
+```
+
+# Ensuring disposability: Fast startup
+Fast startup is relevant in a cloud environment because applications are disposable and frequently created, destroyed, and scaled. The quicker the startup, the sooner a new application instance is
+ready to accept connections.
+Standard applications like microservices are good with a startup time in the range of a few seconds. On the other hand, serverless applications usually require a faster startup phase in the
+range of milliseconds rather than seconds. Spring Boot covers both needs, but the second use case requires some extra work.
+
+# Ensuring disposability: Graceful shutdown
+Gracefully shutting down means the application stops accepting new requests, completes all those still in progress, and closes any open resource like database
+connections.
+All the embedded servers available in Spring Boot support a graceful shutdown mode but in slightly different ways. Tomcat, Jetty, and Netty stop accepting new requests entirely when the
+shutdown signal is received. On the other hand, Undertow keeps accepting new requests but immediately replies with an HTTP 503 response.
+By default, Spring Boot stops the server immediately after receiving a termination signal (*SIGTERM*). You can switch to a graceful mode by configuring SIGTERM the *server.shutdown* property.
+You can also configure the *grace period*, which is how long the application is allowed to process all the pending requests. After the grace period expires, the application is terminated even if there
+are still pending requests. By default, the grace period is 30 seconds. You can change it through the *spring.lifecycle.timeout-per-shutdown-phase* property.
+**application.yml**
+```
+server:
+    port: 9001
+    shutdown: graceful
+    tomcat:
+        connection-timeout: 2s
+        threads:
+            max: 50
+            min-spare: 5
+spring:
+    application:
+        name: catalog-service
+    lifecycle:
+        timeout-per-shutdown-phase: 15s
+```
+
+After enabling application support for graceful shutdown, you need to update the Deployment manifest accordingly.
+
+The recommended solution is to delay sending the *SIGTERM* signal to the Pod so that Kubernetes has enough time to spread the news across the cluster. By doing so, when the Pod starts the
+graceful shutdown procedure, all Kubernetes components already know not to send new requests to it. Technically, the delay can be configured through a *preStop* hook.
+**catalog-service/k8s/deployment.yml**
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: catalog-service
+...    
+
+            containers:
+            - name: catalog-service
+              image: polarbookshop/catalog-service:0.0.1-SNAPSHOT
+              imagePullPolicy: Always
+              lifecycle:
+                preStop:
+                    exec:
+                        command: [ "sh", "-c", "sleep 5" ]
+```
+
+# Local Kubernetes development with Skaffold and Octant
+These tools are used to set up a local Kubernetes development workflow to automate steps like building images and applying manifests to a Kubernetes cluster.
+It’s part of what is defined as the *inner loop* of working with a Kubernetes platform.
+Using Skaffold, you can focus on the business logic of your applications rather than on all those infrastructural concerns, and Octant is used to visualize and 
+manage the Kubernetes objects through a convenient GUI.
+
+# Defining a development workflow on Kubernetes with Skaffold
+Skaffold is a tool developed by Google that "handles the workflow for building, pushing and deploying your application, allowing you to focus on what matters most: writing code". You can
+find instructions on how to install it on the official website: skaffold.dev.
+The goal is to design a workflow that will automate the following steps for you:
+* packaging a Spring Boot application as a container image using Cloud Native Buildpacks;
+* uploading the image to a Kubernetes cluster created with kind;
+* creating all the Kubernetes objects described in the YAML manifests;
+* enabling the port-forward functionality to access applications from your local computer;
+* collecting the logs from the application and showing them in your console.
+
+# Configuring Skaffold for building and deploying
+You can initialize Skaffold in a new project using the skaffold init command and choosing a strategy for building the application.
+Navigate to the project root folder, and run the following command:
+```
+$ skaffold init --XXenableBuildpacksInit
+```
+
+The resulting configuration will be saved in a *skaffold.yaml* file created in your project root folder. If it doesn’t show up in your IDE, try refreshing the project. So far, we’ve been using the
+.yml extension for YAML files. To be consistent, go ahead and rename the Skaffold configuration file to *skaffold.yml*.
+The *build* part describes how you want to package the application. The *deploy* part specifies what you want to deploy.
+
+# Deploying applications to K8 with Skaffold
+The first option for running Skaffold is the development mode, which builds and deploys the objects you configured in *skaffold.yml*, and then starts watching the project source code.
+When something changes, it rolls out the updated objects in your local Kubernetes cluster automatically.
+In the project root folder:
+```
+$ skaffold dev --port-forward
+```
+
+The --port-forward flag will set up automatic port forwarding to your local machine. Information on which port is forwarded is printed out at the end of the task.
+Unless it’s not available, Skaffold will use the port you defined for the Service object.
+When you’re done working with the application, you can terminate the Skaffold process (Ctrl+C), and all the Kubernetes objects will get deleted automatically.
+Another option for running Skaffold is using the command. *skaffold run*. It works like the development mode, but it doesn’t provide live-reload nor clean up when it terminates. It’s
+typically used in a CI/CD pipeline.
+
+# Asynchronous and non-blocking architectures with Reactor and Spring
+The Reactive Manifesto (www.reactivemanifesto.org/) describes a reactive system as responsive, resilient, elastic, and message-driven. Its mission to build loosely-coupled, scalable, resilient, and
+cost-effective applications is fully compatible with our definition of cloud native. The new part is achieving that goal by using an asynchronous and non-blocking communication paradigm based
+on message-passing.
+
+## From thread-per-request to event loop
+Non-reactive applications allocate a thread per request. Until a response is returned, the thread will not be used for anything. This is the *thread-per-request* model.
+In the end, this paradigm sets constraints on the application scalability and doesn’t use computational resources in the most efficient way
+possible.
+
+Reactive applications are more scalable and efficient by design. Handling requests in a reactive application doesn’t involve allocating a given thread exclusively, but it’s fulfilled
+asynchronously based on events. For example, if a database read is required, the thread handling that part of the flow will not wait until data is returned from the database. Instead, a callback is
+registered, and whenever the information is ready, a notification is sent, and one of the available threads will execute the callback. During that time, the thread can be used to process other
+requests rather than waiting idle.
+This paradigm, called *event loop*, doesn’t set hard constraints on the application event loop scalability. It actually makes it easier to scale since an increase in the number of concurrent requests does not
+strictly depend on the number of threads. As a matter of fact, a default configuration for reactive applications in Spring is to use only one thread per CPU core. With the non-blocking I/O
+capability and a communication paradigm based on events, reactive applications allow more efficient utilization of computational resources.
+
+One of the essential features of reactive applications is to provide non-blocking backpressure (also called *control flow*). It means that consumers can control the amount control flow of data received to
+lower the risk of producers sending more data than the consumer can handle and causing a DoS attack, slowing the application, cascading the failure or even leading to a total crash.
+
+The reactive paradigm is a solution to the problem of blocking I/O operations that require more threads to handle high concurrency and may lead to slow or entirely unresponsive applications.
+Sometimes the paradigm is mistaken as a way to increase the speed of an application. Reactive is about improving scalability and resilience, not speed.
+
+However, you should also be aware of the additional complexity introduced by such a paradigm. Besides requiring a mindset shift to think in an event-driven way, reactive applications are more
+challenging to debug and troubleshoot because of the asynchronous I/O. Before rushing to rewriting all your applications to make them reactive, think twice if that’s necessary and consider
+both benefits and drawbacks.
+
+## Project Reactor: Reactive streams with Mono and Flux
+Conceptually, reactive streams resemble the Java Stream API in the way of building data pipelines. One of the key differences is that a Java stream is pull-based: consumers process data
+in an imperative and synchronous fashion. Instead, reactive streams are push-based: consumers are notified by the producers when new data is available, so the processing happens
+asynchronously.
+Reactive streams work according to a producer/consumer paradigm. Producers are called *publishers*. They produce data that might be eventually available. Reactor provides publishers two central
+APIs implementing the *Producer<T>* interface for objects of type *<T>* and used to compose asynchronous, observable data streams: *Mono<T>* and *Flux<T>*.
+Consumers are called *subscriber*s because they subscribe to a publisher and are notified whenever new data is available. As part of the *subscription*, consumers can also define
+backpressure by informing the publisher they can process only a certain amount of data at a time.
+That is a powerful feature that puts consumers in control of how much data is received, preventing them from being overwhelmed and becoming unresponsive. Reactive streams are
+activated only if there’s a subscriber.
+
+## Understanding the Spring reactive stack
+When you build applications with Spring, you can choose between a servlet stack and a reactive stack.
+The servlet stack is based on the Servlet API and a Servlet container (e.g., Tomcat). In contrast, the reactive model is based on the Reactive Streams API (implemented by Project Reactor) and
+either Netty or a Servlet container (version 3.1 as a minimum). Both stacks let you build RESTful applications using either classes annotated as @RestController
+or functional endpoints called Router Functions. The servlet stack uses Spring MVC, while the reactive stack uses Spring WebFlux.
+
+# Resilient applications with Reactive Spring
+Resilience is about keeping a system available and delivering its services, even when failures happen. Since failures will happen and there’s no way to prevent them all, it becomes critical to
+design fault-tolerant applications. The goal is to keep the system available without the user noticing. In the worst-case scenario, it could have degraded functionality, but it should still be
+available.
+
+## Timeouts
+Whenever your application calls a remote service, you don’t know if and when a response will be received. Timeouts (also called *time limiters*) are a simple, yet effective tool time limiters to preserve the
+responsiveness of your application in case a response is not received within a reasonable time period.
+
+Two main reasons for setting up timeouts are:
+* if you don’t limit the time your client waits, you risk your computational resources being blocked for too long (for imperative applications). In the worst-case scenario, your
+application will be completely unresponsive because all the available threads are blocked, waiting for a response from a remote service, so there’s no thread available to handle new
+requests anymore;
+* if you can’t meet your Service Level Agreements (SLAs), there’s no reason to keep waiting for an answer, better to fail the request.
+
+Examples of timeouts are:
+* **Connection timeout**. It’s the time limit for establishing a communication channel with a remote resource. Earlier, you configured the server.netty.connection-timeout
+property to limit the time Netty waits for a request to be received after accepting the initial connection.
+* **Connection pool timeout**. It’s the time limit for a client to get a connection from a pool (timeout for the Hikari connection pool through the spring.datasource.hikari.connection-timeout property.
+
+* **Read timeout**. It’s the time limit to read from a remote resource after establishing the initial connection.
+
+You can also specify a failover instead of throwing the exception: When a response is received from the remote service within the time limit, the request is
+successful. If the timeout expires and no response is received, then a fallback behavior is executed, if any. Otherwise, an exception is thrown.

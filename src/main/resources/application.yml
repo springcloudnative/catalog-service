@@ -1,16 +1,20 @@
 server:
-  port: 9001  # HTTP port
+  port: 9001                # HTTP port
+  shutdown: graceful        # Enable graceful shutdown
   tomcat:
     connection-timeout: 2s  # Connection timeout
     threads:
       max: 50
-      min-spare: 5  # how many threads are created at startup
+      min-spare: 5          # how many threads are created at startup
 
 spring:
   application:
     name: catalog-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
   config:
-    import: "optional:configserver:"
+    active:
+      on-profile: testdata
   cloud:
     config:
       uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
@@ -22,17 +26,39 @@ spring:
         initial-interval: 1000 # 1s
         max-interval: 2000 # 2s
         multiplier: 1.1
-  profiles:
-    active: testdata
   datasource:
-    url: jdbc:mysql://localhost:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
-    username: user
-    password: password
-    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:catalog_user}
+    password: ${DB_PASSWORD:Y2F0YWxvZ191c2VyCg==}
     hikari:
+      initialization-fail-timeout: 0
       connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
       maximum-pool-size: 5      # The maximum number of connections Hikari CP will keep in the pool
       connectionTestQuery: SELECT 1
+  flyway:
+    table: catalog_service_flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
+
+---
+
+spring:
+  application:
+    name: catalog-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
+  cloud:
+    config:
+      enabled: false
+      import: "optional:configserver:"
+  config:
+    activate:
+      on-profile: integration
+  flyway:
+    table: catalog_service_flyway_schema_history
+    baseline-on-migrate: true
+    baseline-version: 0
 
 management:
   endpoints:

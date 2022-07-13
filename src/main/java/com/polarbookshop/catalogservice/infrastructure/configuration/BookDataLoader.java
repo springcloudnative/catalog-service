@@ -12,10 +12,10 @@ import java.util.List;
 
 @Data
 @Component
-@Profile("test-data")
+@Profile("testdata")
 public class BookDataLoader {
 
-    private final BooksRepository booksRepository;
+    private final BooksRepository bookJdbcRepository;
 
     /**
      * The test data generation is triggered when an ApplicationReadyEvent
@@ -24,7 +24,7 @@ public class BookDataLoader {
     @EventListener(ApplicationReadyEvent.class)
     public void loadBookTestData() {
         // delete all existing books, if any, to start from an empty database
-        this.booksRepository.deleteAll();
+        this.bookJdbcRepository.deleteAll();
 
         BookEntity book1 = BookEntity.build("1234567891", "Northern Lights",
                 "Lyra Silvertongue", 9.90, "Polarsophia");
@@ -33,6 +33,6 @@ public class BookDataLoader {
                 "Iorek Polarson", 12.90, "Polarsophia");
 
         // save multiple objects at once
-        booksRepository.saveAll(List.of(book1, book2));
+        bookJdbcRepository.saveAll(List.of(book1, book2));
     }
 }
