@@ -25,13 +25,17 @@
 		<testcontainersVersion>1.16.3</testcontainersVersion>
 		<!--The username to use when authenticating with the container registry. The value is
 		passed as a Maven property-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryUsername>${REGISTRY_USERNAME}</registryUsername>
 		<!--The token to use when authenticating with the container registry. The value is
 		passed as a Maven property.-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryToken>${REGISTRY_TOKEN}</registryToken>
 		<!--The container registry URL. The value is passed as a Maven property.-->
+		<!--suppress UnresolvedMavenProperty -->
 		<registryUrl>${REGISTRY_URL}</registryUrl>
 		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
+		<javafaker.version>1.0.2</javafaker.version>
 	</properties>
 
 	<dependencyManagement>
@@ -40,6 +44,14 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
 				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainersVersion}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -90,6 +102,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -117,6 +130,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.github.javafaker</groupId>
+			<artifactId>javafaker</artifactId>
+			<version>${javafaker.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${testcontainersVersion}</version>
@@ -131,6 +150,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -141,46 +166,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-contract-verifier</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-<!--			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<layers>
-						<enabled>true</enabled>
-					</layers>
-					<image>
-						<name>${registryUsername}/${project.name}:${project.version}</name>
-						<publish>true</publish>
-						<env>
-							<BP_JVM_VERSION>11</BP_JVM_VERSION>
-						</env>
-					</image>
-					<docker>
-						<builderRegistry>
-							<username>${registryUsername}</username>
-							<password>${registryToken}</password>
-							<url>${registryUrl}</url>
-						</builderRegistry>
-						<publishRegistry>
-							<username>${registryUsername}</username>
-							<password>${registryToken}</password>
-							<url>${registryUrl}</url>
-						</publishRegistry>
-					</docker>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build-image</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>-->
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -192,6 +187,32 @@
 					</execution>
 				</executions>
 			</plugin>
+
+<!--			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+			</plugin>-->
+
+<!--			<plugin>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-contract-maven-plugin</artifactId>
+				<version>3.1.1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<baseClassForTests>com.polarbookshop.catalogservice.application.api.rest.BaseTest</baseClassForTests>
+				</configuration>
+			</plugin>-->
+
+<!--			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<testEnvironment>true</testEnvironment>
+					</systemPropertyVariables>
+					<argLine>-Dspring.profiles.active=integration</argLine>
+				</configuration>
+			</plugin>-->
 		</plugins>
 	</build>
 

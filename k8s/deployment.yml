@@ -34,9 +34,9 @@ spec:
             - name: DB_NAME
               value: polardb_catalog
             - name: DB_USERNAME
-              value: user
+              value: catalog_user
             - name: DB_PASSWORD
-              value: password
+              value: Y2F0YWxvZ191c2VyCg==
 
 ---
 apiVersion: v1

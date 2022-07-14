@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * lets us perform parsing operations using the Jackson library.
  */
 @JsonTest // Identifies a test class that focuses on JSON serialization.
+@ActiveProfiles("integration")
 public class BookJsonTests {
 
     // Utility class to assert JSON serialization and deserialization.
