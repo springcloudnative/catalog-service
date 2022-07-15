@@ -15,8 +15,11 @@ spring:
   config:
     active:
       on-profile: mysqldev
+    enabled: true
+    import: "optional:configserver:"
   cloud:
     config:
+      enabled: true
       uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
       request-connect-timeout: 2000 # Timeout on waiting to connect to the config server (ms)
       request-read-timeout: 5000    # Timeout on waiting to read configuration data from the config server (ms)
@@ -48,13 +51,10 @@ spring:
     name: catalog-service
   lifecycle:
     timeout-per-shutdown-phase: 15s # Defines a 15s grace period
-  cloud:
-    config:
-      enabled: false
-      import: "optional:configserver:"
   config:
     activate:
       on-profile: integration
+    import: "optional:configserver:"
   flyway:
     table: catalog_service_flyway_schema_history
     baseline-on-migrate: true
