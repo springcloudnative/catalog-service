@@ -14,7 +14,7 @@ spring:
     timeout-per-shutdown-phase: 15s # Defines a 15s grace period
   config:
     active:
-      on-profile: testdata
+      on-profile: mysqldev
   cloud:
     config:
       uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
@@ -40,9 +40,9 @@ spring:
     table: catalog_service_flyway_schema_history
     baseline-on-migrate: true
     baseline-version: 0
+    locations: classpath:mysqlmigrations
 
 ---
-
 spring:
   application:
     name: catalog-service
