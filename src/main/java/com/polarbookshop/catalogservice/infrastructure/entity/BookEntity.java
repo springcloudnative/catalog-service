@@ -51,6 +51,16 @@ public class BookEntity {
                 .build();
     }
 
+    /**
+     * An entity is considered new when the id is null and
+     * the version is 0.
+     * @param isbn
+     * @param title
+     * @param author
+     * @param price
+     * @param publisher
+     * @return
+     */
     public static BookEntity build(String isbn, String title,
                                    String author, Double price,
                                    String publisher) {
