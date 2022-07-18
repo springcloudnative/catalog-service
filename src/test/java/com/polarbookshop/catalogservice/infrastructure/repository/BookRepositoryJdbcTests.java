@@ -1,10 +1,12 @@
 package com.polarbookshop.catalogservice.infrastructure.repository;
 
 import com.polarbookshop.catalogservice.infrastructure.configuration.DataConfig;
+import com.polarbookshop.catalogservice.infrastructure.configuration.FlywayConfig;
 import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
@@ -15,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@DataJdbcTest
+@DataJdbcTest()
 @Import(DataConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("integration")

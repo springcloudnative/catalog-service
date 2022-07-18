@@ -46,19 +46,19 @@ spring:
     locations: classpath:mysqlmigrations
 
 ---
-spring:
-  application:
-    name: catalog-service
-  lifecycle:
-    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
-  config:
-    activate:
-      on-profile: integration
-    import: "optional:configserver:"
-  flyway:
-    table: catalog_service_flyway_schema_history
-    baseline-on-migrate: true
-    baseline-version: 0
+#spring:
+#  application:
+#    name: catalog-service
+#  lifecycle:
+#    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
+#  config:
+#    activate:
+#      on-profile: integration
+#    import: "optional:configserver:"
+#  flyway:
+#    table: catalog_service_flyway_schema_history
+#    baseline-on-migrate: true
+#    baseline-version: 0
 
 management:
   endpoints:

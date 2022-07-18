@@ -3,10 +3,12 @@ package com.polarbookshop.catalogservice.application.api.rest;
 import com.polarbookshop.catalogservice.application.exception.BookNotFoundException;
 import com.polarbookshop.catalogservice.application.service.BookService;
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.infrastructure.configuration.FlywayConfig;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(BookController.class)
 @ActiveProfiles("integration")
+@EnableAutoConfiguration(exclude = FlywayConfig.class)
 class BookControllerMvcTests {
 
     @Autowired

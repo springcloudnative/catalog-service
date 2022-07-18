@@ -1,0 +1,18 @@
+spring:
+#  application:
+#    name: catalog-service
+  lifecycle:
+    timeout-per-shutdown-phase: 15s # Defines a 15s grace period
+  config:
+    activate:
+      on-profile: integration
+    import: "optional:configserver:"
+  datasource:
+    url: jdbc:tc:mysql:8.0:///polardb_catalog?TC_INITSCRIPT=file:src/main/resources/mysqlmigrations/V1__Catalog_initial_schema.sql
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    initialization-mode: always
+  flyway:
+    enabled: false
+#    table: catalog_service_flyway_schema_history
+#    baseline-on-migrate: true
+#    baseline-version: 0
