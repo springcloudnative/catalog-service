@@ -18,6 +18,7 @@ spec:
         - name: catalog-service
           image: ernestoacostacuba/catalog-service
           imagePullPolicy: IfNotPresent
+          args: ["--spring.profiles.active=mysqldev"]
           lifecycle:
             preStop:  # Makes K8 wait 5 seconds before sending the SIGTERM signal to the Pod
               exec:
@@ -30,14 +31,26 @@ spec:
             - name: SPRING_CLOUD_CONFIG_URI
               value: http://config-service
             - name: DB_HOST
-              value: polar-mysql-catalog
+              value: polar-mysql
             - name: DB_NAME
               value: polardb_catalog
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://polar-mysql:3306/polardb_catalog?useSSL=false&allowPublicKeyRetrieval=true
             - name: DB_USERNAME
-              value: catalog_user
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-creds
+                  key: catalog_mysql_user
             - name: DB_PASSWORD
-              value: Y2F0YWxvZ191c2VyCg==
-
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-creds
+                  key: catalog_mysql_password
+            - name: FLYWAY_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: polar-mysql-conf
+                  key: spring_flyway_url
 ---
 apiVersion: v1
 kind: Service
@@ -53,3 +66,4 @@ spec:
     - protocol: "TCP"
       port: 80
       targetPort: 9001
+---

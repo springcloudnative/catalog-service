@@ -4,21 +4,14 @@ metadata:
   name: catalog-service
 build:
   artifacts:
-  - image: ernestoacostacuba/catalog-service
-    jib:
-      args:
-        - -Pjib
-        - -DskipTests=true
-  tagPolicy:
-    gitCommit: {
-                 variant: AbbrevTreeSha,
-                 ignoreChanges: true
-    }
-
+    - image: ernestoacostacuba/catalog-service
+      buildpacks:
+        builder: gcr.io/paketo-buildpacks/builder:base
+        env:
+          - BP_JVM_VERSION=11.*
   local:
     push: false
-
 deploy:
   kubectl:
     manifests:
-    - k8s/deployment.yml
+      - k8s/deployment.yml

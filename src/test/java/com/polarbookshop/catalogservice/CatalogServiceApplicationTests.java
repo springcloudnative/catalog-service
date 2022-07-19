@@ -6,14 +6,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,24 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
-@DirtiesContext
-@Testcontainers
 class CatalogServiceApplicationTests {
-
-	@Container
-	public static MySQLContainer<?> mySqlDB = new MySQLContainer<>
-			("mysql:8.0")
-			.withDatabaseName("polar")
-			.withUsername("admin")
-			.withPassword("admin");
-
-	@DynamicPropertySource
-	public static void properties(DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url",mySqlDB::getJdbcUrl);
-		registry.add("spring.datasource.username", mySqlDB::getUsername);
-		registry.add("spring.datasource.password", mySqlDB::getPassword);
-
-	}
 
 	@Autowired
 	private WebTestClient webTestClient;	// Utility to perform REST calls for testing
