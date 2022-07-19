@@ -34,6 +34,7 @@
 		<!--The container registry URL. The value is passed as a Maven property.-->
 		<!--suppress UnresolvedMavenProperty -->
 		<registryUrl>${REGISTRY_URL}</registryUrl>
+		<!--suppress UnresolvedMavenProperty -->
 		<imageVersion>${IMAGE_VERSION}</imageVersion>
 		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 		<javafaker.version>1.0.2</javafaker.version>

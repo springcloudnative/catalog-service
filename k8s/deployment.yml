@@ -17,7 +17,7 @@ spec:
       containers:
         - name: catalog-service
           image: ernestoacostacuba/catalog-service
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=mysqldev"]
           lifecycle:
             preStop:  # Makes K8 wait 5 seconds before sending the SIGTERM signal to the Pod
@@ -52,4 +52,18 @@ spec:
                   name: polar-mysql-conf
                   key: spring_flyway_url
 ---
-
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+  labels:
+    app: catalog-service
+spec:
+  type: ClusterIP
+  selector:
+    app: catalog-service
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 9001
+---
