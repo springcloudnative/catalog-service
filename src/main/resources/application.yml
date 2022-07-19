@@ -44,6 +44,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:mysqlmigrations
+    user: ${DB_USERNAME:catalog_user}
+    password: ${DB_PASSWORD:Y2F0YWxvZ191c2Vy}
+    url: ${FLYWAY_URI}
 
 management:
   endpoints:
