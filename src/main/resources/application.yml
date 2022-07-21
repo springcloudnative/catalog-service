@@ -33,7 +33,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:catalog_user}
-    password: ${DB_PASSWORD:Y2F0YWxvZ191c2Vy}
+    password: ${DB_PASSWORD:TXlzcWwzMjFDYXRhbG9n}
     hikari:
       initialization-fail-timeout: 0
       connection-timeout: 2000  # The maximum time (ms) waiting for getting a connection from the pool
@@ -44,9 +44,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:mysqlmigrations
-    user: ${DB_USERNAME:catalog_user}
-    password: ${DB_PASSWORD:Y2F0YWxvZ191c2Vy}
-    url: ${FLYWAY_URI}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
 
 management:
   endpoints:

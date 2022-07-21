@@ -3,7 +3,6 @@ package com.polarbookshop.catalogservice.application.api.rest;
 import com.polarbookshop.catalogservice.application.exception.BookNotFoundException;
 import com.polarbookshop.catalogservice.application.service.BookService;
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
-import com.polarbookshop.catalogservice.infrastructure.configuration.FlywayConfig;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
