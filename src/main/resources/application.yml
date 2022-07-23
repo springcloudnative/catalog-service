@@ -44,9 +44,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:mysqlmigrations
-    user: ${spring.datasource.username}
-    password: ${spring.datasource.password}
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
+#    user: ${spring.datasource.username}
+#    password: ${spring.datasource.password}
+#    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:polardb_catalog}?useSSL=false&allowPublicKeyRetrieval=true
 
 management:
   endpoints:
