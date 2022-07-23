@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(BookController.class)
 @ActiveProfiles("integration")
-@EnableAutoConfiguration(exclude = FlywayConfig.class)
+@EnableAutoConfiguration
 class BookControllerMvcTests {
 
     @Autowired

@@ -12,5 +12,5 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
  */
 @Configuration
 @EnableJdbcAuditing         // Enables auditing for persistent entities
-public class DataConfig {
+public class    DataConfig {
 }
