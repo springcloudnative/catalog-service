@@ -188,6 +188,7 @@
 	</build>
 
 	<profiles>
+		<!-- Profile to build the docker image with Jib -->
 		<profile>
 			<id>jib</id>
 			<activation>
@@ -204,6 +205,9 @@
 								<ports>
 									<port>9001</port>
 								</ports>
+								<jvmFlags>
+									<jvmFlag>-DskipTests</jvmFlag>
+								</jvmFlags>
 							</container>
 						</configuration>
 					</plugin>
