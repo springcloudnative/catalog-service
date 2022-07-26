@@ -35,7 +35,7 @@
 		<!--suppress UnresolvedMavenProperty -->
 		<registryUrl>${REGISTRY_URL}</registryUrl>
 		<!--suppress UnresolvedMavenProperty -->
-		<imageVersion>${IMAGE_VERSION}</imageVersion>
+		<imageVersion>${project.version}</imageVersion>
 		<jib-maven-plugin.version>3.2.1</jib-maven-plugin.version>
 		<javafaker.version>1.0.2</javafaker.version>
 	</properties>
@@ -188,6 +188,7 @@
 	</build>
 
 	<profiles>
+		<!-- Profile to build the docker image with Jib -->
 		<profile>
 			<id>jib</id>
 			<activation>
@@ -204,6 +205,10 @@
 								<ports>
 									<port>9001</port>
 								</ports>
+								<jvmFlags>
+									<jvmFlag>-DskipTests</jvmFlag>
+									<jvmFlag>-Dspring.profiles.active=mysqldev</jvmFlag>
+								</jvmFlags>
 							</container>
 						</configuration>
 					</plugin>
@@ -215,6 +220,9 @@
 			<id>remote</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>!imageVersion</name>
+				</property>
 			</activation>
 			<build>
 				<plugins>
