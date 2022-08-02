@@ -1,9 +1,16 @@
 package com.polarbookshop.catalogservice;
 
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.domain.dto.BookDTO;
+import com.polarbookshop.catalogservice.domain.vo.IsbnCode;
+import com.polarbookshop.catalogservice.domain.vo.Title;
 import com.polarbookshop.catalogservice.infrastructure.entity.BookEntity;
+import com.polarbookshop.catalogservice.infrastructure.repository.BaseTest;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,46 +34,65 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
-class CatalogServiceApplicationTests {
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class CatalogServiceApplicationTests extends BaseTest {
 
 	@Autowired
 	private WebTestClient webTestClient;	// Utility to perform REST calls for testing
+
+	private Title title = new Title("Title");
 
 	@Test
 	void contextLoads() {
 	}
 
+	/**
+	 * Testing HTTP GET request to get a Book by ISBN.
+	 */
 	@Test
+	@Order(1)
 	public void whenGetRequestWithIdThenBookReturned() {
-		String bookIsbn = "1231231230";
-		BookEntity bookToCreate = BookEntity.build(bookIsbn, "Title", "Author",
-				9.90, "Polarsophia");
 
-		BookEntity expectedBook = webTestClient
+		BookDTO bookToCreate = getDTOForBookCreation();
+
+		BookAggregate expectedBook = webTestClient
 					.post()
 					.uri("/books")
 					.bodyValue(bookToCreate)
 					.exchange()
 					.expectStatus().isCreated()
-					.expectBody(BookEntity.class).value(book -> assertThat(book).isNotNull())
+					.expectBody(BookAggregate.class).value(book -> assertThat(book).isNotNull())
 					.returnResult().getResponseBody();
 
+		System.out.println("expectedBook: " + expectedBook);
 		webTestClient
 				.get()
-				.uri("/books/" + bookIsbn)
+				.uri("/books/" + this.isbnCode.getValue())
 				.exchange()
 				.expectStatus().is2xxSuccessful()
-				.expectBody(BookEntity.class).value(actualBook -> {
+				.expectBody(BookAggregate.class).value(actualBook -> {
 					assertThat(actualBook).isNotNull();
-					assertThat(actualBook.getIsbn()).isEqualTo(expectedBook.getIsbn());
+					assertThat(actualBook.getIsbn().getValue()).isEqualTo(expectedBook.getIsbn().getValue());
 				});
 	}
 
+	/**
+	 * Testing HTTP POST request to save a Book.
+	 */
 	@Test
+	@Order(2)
 	public void whenPostRequestThenBookCreated() {
+
+		BookDTO bookToCreate = getDTOForBookCreation();
+
+		webTestClient
+				.delete().uri("/books/" + bookToCreate.getIsbn())
+				.exchange()
+				.expectStatus().isNoContent();
+
 		BookAggregate expectedBook = BookAggregate.builder()
-									.isbn("1231231231")
-									.title("Title")
+									.isbn(this.isbnCode)
+									.title(this.title)
 									.author("Author")
 									.price(9.90)
 									.publisher("Polarsophia")
@@ -74,26 +100,29 @@ class CatalogServiceApplicationTests {
 
 		webTestClient
 				.post().uri("/books")	// HTTP POST request to the "/books" endpoint
-				.bodyValue(expectedBook)	// Adds the book in the request body
+				.bodyValue(bookToCreate)	// Adds the book in the request body
 				.exchange()					// Sends the request
 				.expectStatus().isCreated()
 				.expectBody(BookAggregate.class).value(actualBook -> {
 					Assertions.assertThat(actualBook).isNotNull();
-					Assertions.assertThat(actualBook.getIsbn()).isEqualTo(expectedBook.getIsbn());
+					Assertions.assertThat(actualBook.getIsbn().getValue())
+							.isEqualTo(expectedBook.getIsbn().getValue());
 				});
 	}
 
+	/**
+	 * Testing HTTP PUT request to update a Book.
+	 */
 	@Test
+	@Order(3)
 	public void whenPutRequestThenBookUpdated() {
-		String bookIsbn = "1231231232";
 
-		BookAggregate bookToCreate = BookAggregate.builder()
-				.isbn(bookIsbn)
-				.title("Title")
-				.author("Author")
-				.price(9.90)
-				.publisher("Polarsophia")
-				.build();
+		BookDTO bookToCreate = getDTOForBookCreation();
+
+		webTestClient
+				.delete().uri("/books/" + bookToCreate.getIsbn())
+				.exchange()
+				.expectStatus().isNoContent();
 
 		BookAggregate createdBook = webTestClient
 					.post()
@@ -106,10 +135,10 @@ class CatalogServiceApplicationTests {
 					})
 				.returnResult().getResponseBody();
 
-		BookAggregate bookToUpdate = BookAggregate.builder()
+		BookDTO bookToUpdate = BookDTO.builder()
 				.id(createdBook.getId())
-				.isbn(createdBook.getIsbn())
-				.title(createdBook.getTitle())
+				.isbn(createdBook.getIsbn().getValue())
+				.title(createdBook.getTitle().getValue())
 				.author(createdBook.getAuthor())
 				.price(7.95)
 				.publisher(createdBook.getPublisher())
@@ -119,7 +148,7 @@ class CatalogServiceApplicationTests {
 				.build();
 
 		webTestClient
-				.put().uri("/books/" + bookIsbn)
+				.put().uri("/books/" + bookToUpdate.getIsbn())
 				.bodyValue(bookToUpdate)
 				.exchange()
 				.expectStatus().isOk()
@@ -129,15 +158,19 @@ class CatalogServiceApplicationTests {
 				});
 	}
 
+	/**
+	 * Testing HTTP DELETE request to delete a Book.
+	 */
 	@Test
+	@Order(4)
 	public void whenDeleteRequestThenBookDeleted() {
-		String bookIsbn = "1231231233";
-		BookAggregate bookToCreate = BookAggregate.builder()
-				.isbn(bookIsbn)
-				.title("Title")
-				.author("Author")
-				.price(9.90)
-				.build();
+
+		BookDTO bookToCreate = getDTOForBookCreation();
+
+		webTestClient
+				.delete().uri("/books/" + bookToCreate.getIsbn())
+				.exchange()
+				.expectStatus().isNoContent();
 
 		webTestClient
 				.post().uri("/books")
@@ -146,17 +179,17 @@ class CatalogServiceApplicationTests {
 				.expectStatus().isCreated();
 
 		webTestClient
-				.delete().uri("/books/" + bookIsbn)
+				.delete().uri("/books/" + bookToCreate.getIsbn())
 				.exchange()
 				.expectStatus().isNoContent();
 
 		webTestClient
 				.get()
-				.uri("/books/" + bookIsbn)
+				.uri("/books/" + bookToCreate.getIsbn())
 				.exchange()
 				.expectStatus().isNotFound()
 				.expectBody(String.class).value(errorMessage -> {
-					assertThat(errorMessage).isEqualTo("The book with ISBN " + bookIsbn + " was not found.");
+					assertThat(errorMessage).isEqualTo(String.format("The book with ISBN %s was not found.", bookToCreate.getIsbn()));
 				});
 	}
 }

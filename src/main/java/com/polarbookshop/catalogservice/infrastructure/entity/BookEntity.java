@@ -1,6 +1,8 @@
 package com.polarbookshop.catalogservice.infrastructure.entity;
 
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.domain.vo.IsbnCode;
+import com.polarbookshop.catalogservice.domain.vo.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,8 +43,8 @@ public class BookEntity {
 
     public BookAggregate toBookAggregate() {
         return BookAggregate.builder()
-                .isbn(this.isbn)
-                .title(this.title)
+                .isbn(new IsbnCode(this.isbn))
+                .title(new Title(this.title))
                 .author(this.author)
                 .price(this.price)
                 .publisher(this.publisher)

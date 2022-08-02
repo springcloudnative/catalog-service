@@ -50,13 +50,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookAggregate addBookToCatalog(BookAggregate book) {
-        if (bookJdbcRepository.existsByIsbn(book.getIsbn())) {
-            throw new BookAlreadyExistsException(book.getIsbn());
+        if (bookJdbcRepository.existsByIsbn(book.getIsbn().getValue())) {
+            throw new BookAlreadyExistsException(book.getIsbn().getValue());
         }
 
         BookEntity bookEntity = BookEntity.build(
-                book.getIsbn(),
-                book.getTitle(),
+                book.getIsbn().getValue(),
+                book.getTitle().getValue(),
                 book.getAuthor(),
                 book.getPrice(),
                 book.getPublisher()
@@ -87,7 +87,7 @@ public class BookServiceImpl implements BookService {
         BookEntity bookToUpdate = new BookEntity(
                 existingBook.get().getId(),
                 existingBook.get().getIsbn(),
-                book.getTitle(),
+                book.getTitle().getValue(),
                 book.getAuthor(),
                 book.getPrice(),
                 book.getPublisher(),

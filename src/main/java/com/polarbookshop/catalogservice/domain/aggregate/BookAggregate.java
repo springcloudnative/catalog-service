@@ -1,5 +1,9 @@
 package com.polarbookshop.catalogservice.domain.aggregate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.polarbookshop.catalogservice.domain.dto.BookDTO;
+import com.polarbookshop.catalogservice.domain.vo.IsbnCode;
+import com.polarbookshop.catalogservice.domain.vo.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,26 +22,34 @@ import java.time.Instant;
 public class BookAggregate {
     private Long id;
 
-    @NotBlank(message = "The book ISBN must be defined.")
-    @Pattern(regexp = "^([0-9]{10}|[0-9]{13})$", message = "The ISBN format " +
-            "must follow the standards ISBN-10 or ISBN-13.")
-    private String isbn;
+    @JsonProperty("isbn")
+    private IsbnCode isbn;
 
-    @NotBlank(message = "The book title must be defined.")
-    private String title;
+    private Title title;
 
-    @NotBlank(message = "The book author must be defined.")
     private String author;
 
-    @NotNull(message = "The book price must be defined.")
-    @Positive(message = "The book price must be greater than zero.")
     private Double price;
 
-    String publisher;
+    private String publisher;
 
     private Instant createdDate;
 
     private Instant lastModifiedDate;
 
     private int version;
+
+    public static BookAggregate createFrom(BookDTO bookDTO) {
+        return BookAggregate.builder()
+                .id(bookDTO.getId())
+                .isbn(new IsbnCode(bookDTO.getIsbn()))
+                .title(new Title(bookDTO.getTitle()))
+                .author(bookDTO.getAuthor())
+                .price(bookDTO.getPrice())
+                .publisher(bookDTO.getPublisher())
+                .createdDate(bookDTO.getCreatedDate())
+                .lastModifiedDate(bookDTO.getLastModifiedDate())
+                .version(bookDTO.getVersion())
+                .build();
+    }
 }

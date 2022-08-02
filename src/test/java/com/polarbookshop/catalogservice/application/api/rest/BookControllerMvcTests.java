@@ -3,6 +3,9 @@ package com.polarbookshop.catalogservice.application.api.rest;
 import com.polarbookshop.catalogservice.application.exception.BookNotFoundException;
 import com.polarbookshop.catalogservice.application.service.BookService;
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.domain.vo.IsbnCode;
+import com.polarbookshop.catalogservice.domain.vo.Title;
+import com.polarbookshop.catalogservice.infrastructure.repository.BaseTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
@@ -36,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BookController.class)
 @ActiveProfiles("integration")
 @EnableAutoConfiguration
-class BookControllerMvcTests {
+class BookControllerMvcTests extends BaseTest {
 
     @Autowired
     private MockMvc mockMvc; // Utility class to test the web layer in a mock environment
@@ -49,8 +52,8 @@ class BookControllerMvcTests {
         Mockito.when(this.bookService.viewBookList()).thenReturn(Arrays.asList(
                 BookAggregate.builder()
                         .id(1L)
-                        .isbn("1234561235")
-                        .title("Title")
+                        .isbn(this.isbnCode)
+                        .title(this.title)
                         .author("Author")
                         .price(12.9)
                         .publisher("Polarsophia")
@@ -60,8 +63,8 @@ class BookControllerMvcTests {
                         .build(),
                 BookAggregate.builder()
                         .id(2L)
-                        .isbn("1234561236")
-                        .title("Title1")
+                        .isbn(this.isbnCode1)
+                        .title(this.title1)
                         .author("Author1")
                         .price(13.9)
                         .publisher("Polarsophia")
@@ -73,8 +76,8 @@ class BookControllerMvcTests {
         this.mockMvc
                 .perform(get("/books"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("@.[0].isbn").value("1234561235"))
-                .andExpect(jsonPath("@.[0].title").value("Title"))
+                .andExpect(jsonPath("@.[0].isbn.value").value(this.isbnCode.getValue()))
+                .andExpect(jsonPath("@.[0].title.value").value(this.title.getValue()))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 

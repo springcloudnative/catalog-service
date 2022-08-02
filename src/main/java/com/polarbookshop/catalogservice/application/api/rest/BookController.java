@@ -2,6 +2,7 @@ package com.polarbookshop.catalogservice.application.api.rest;
 
 import com.polarbookshop.catalogservice.application.service.BookService;
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.domain.dto.BookDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,8 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookAggregate post(@Valid @RequestBody BookAggregate book) {
-        return bookService.addBookToCatalog(book);
+    public BookAggregate post(@Valid @RequestBody BookDTO book) {
+        return bookService.addBookToCatalog(BookAggregate.createFrom(book));
     }
 
     @DeleteMapping("{isbn}")

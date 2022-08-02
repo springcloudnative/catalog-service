@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 @Import(DataConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("integration")
-public class BookRepositoryJdbcTests {
+public class BookRepositoryJdbcTests extends BaseTest {
 
     @Autowired
     private BookRepository bookRepository;
@@ -29,7 +29,7 @@ public class BookRepositoryJdbcTests {
 
     @Test
     public void findBookByIsbnWhenExisting() {
-        String bookIsbn = "1234561235";
+        String bookIsbn = "1234567890";
         BookEntity book = new BookEntity(null, bookIsbn, "Title", "Author",
                 12.9, "Polarsophia", null, null, 0);
 

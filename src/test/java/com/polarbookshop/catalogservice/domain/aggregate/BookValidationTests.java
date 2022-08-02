@@ -1,17 +1,18 @@
 package com.polarbookshop.catalogservice.domain.aggregate;
 
+import com.polarbookshop.catalogservice.domain.vo.IsbnCode;
+import com.polarbookshop.catalogservice.infrastructure.repository.BaseTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class BookValidationTests {
+class BookValidationTests extends BaseTest {
 
     private static Validator validator;
 
@@ -23,29 +24,32 @@ class BookValidationTests {
 
     @Test
     public void whenAllFieldsCorrectThenValidationSucceeds() {
-        BookAggregate book = BookAggregate.builder()
-                            .isbn("1234567890")
-                            .title("Title")
-                            .author("Author")
-                            .price(9.9)
-                            .build();
 
-        Set<ConstraintViolation<BookAggregate>> violations = validator.validate(book);
-        assertThat(violations).isEmpty();
+        assertDoesNotThrow(() -> {
+            BookAggregate book = BookAggregate.builder()
+                    .isbn(this.isbnCode)
+                    .title(this.title)
+                    .author("Author")
+                    .price(9.9)
+                    .build();
+        });
     }
 
     @Test
     public void whenIsbnDefinedButIncorrectThenValidationFails() {
-        BookAggregate book = BookAggregate.builder()
-                .isbn("a234567890")
-                .title("Title")
-                .author("Author")
-                .price(9.9)
-                .build();
 
-        Set<ConstraintViolation<BookAggregate>> violations = validator.validate(book);
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("The ISBN format must follow the standards ISBN-10 or ISBN-13.");
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            BookAggregate book = BookAggregate.builder()
+                    .isbn(new IsbnCode("a234567890"))
+                    .title(this.title)
+                    .author("Author")
+                    .price(9.9)
+                    .build();
+        });
+
+        String expectedMessage = "The ISBN format must follow the standards ISBN-10 or ISBN-13.";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }
 }

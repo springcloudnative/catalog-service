@@ -1,6 +1,7 @@
 package com.polarbookshop.catalogservice.application.api.rest;
 
 import com.polarbookshop.catalogservice.domain.aggregate.BookAggregate;
+import com.polarbookshop.catalogservice.infrastructure.repository.BaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @JsonTest // Identifies a test class that focuses on JSON serialization.
 @ActiveProfiles("integration")
-public class BookJsonTests {
+public class BookJsonTests extends BaseTest {
 
     // Utility class to assert JSON serialization and deserialization.
     @Autowired
@@ -35,8 +36,8 @@ public class BookJsonTests {
         Instant now = Instant.now();
         BookAggregate book = BookAggregate.builder()
                 .id(394L)
-                .isbn("1234567890")
-                .title("Title")
+                .isbn(this.isbnCode)
+                .title(this.title)
                 .author("Author")
                 .price(9.90)
                 .publisher("Polarsophia")
@@ -49,10 +50,10 @@ public class BookJsonTests {
 
         assertThat(jsonContent).extractingJsonPathNumberValue("@.id")
                 .isEqualTo(book.getId().intValue());
-        assertThat(jsonContent).extractingJsonPathStringValue("@.isbn")
-                .isEqualTo(book.getIsbn());
-        assertThat(jsonContent).extractingJsonPathStringValue("@.title")
-                .isEqualTo(book.getTitle());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.isbn.value")
+                .isEqualTo(book.getIsbn().getValue());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.title.value")
+                .isEqualTo(book.getTitle().getValue());
         assertThat(jsonContent).extractingJsonPathStringValue("@.author")
                 .isEqualTo(book.getAuthor());
         assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate")
@@ -86,8 +87,8 @@ public class BookJsonTests {
         // Verifying the parsing from JSON to Java
         assertThat(json.parse(content))
                 .usingRecursiveComparison()
-                .isEqualTo(new BookAggregate(394L, "1234567890",
-                        "Title", "Author",
+                .isEqualTo(new BookAggregate(394L, this.isbnCode,
+                        this.title, "Author",
                         9.90, "Polarsophia", instant,
                         instant, 21));
     }
